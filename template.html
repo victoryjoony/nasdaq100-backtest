@@ -1,0 +1,1658 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QQQ Leverage Lab — 나스닥100 레버리지 ETF 백테스트</title>
+<meta name="description" content="QQQ·QLD·TQQQ 나스닥100 레버리지 ETF에 매일/매주/매월 적립식으로 투자했을 때의 결과를 최대 25년치 실데이터로 백테스트해보세요.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #eef1f4;
+    --surface: #ffffff;
+    --surface-2: #e3e8ec;
+    --text: #0b0f14;
+    --text-dim: #52616f;
+    --muted: #8a94a0;
+    --border: rgba(11,15,20,0.12);
+    --border-strong: rgba(11,15,20,0.20);
+    --accent: #2a78d6;
+    --accent-ink: #ffffff;
+    --chart-surface: #fcfcfb;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --series-3: #1baf7a;
+    --good: #006300;
+    --critical: #d03b3b;
+    --warning: #a86a00;
+    --shadow: 0 1px 2px rgba(11,15,20,0.04), 0 8px 24px -12px rgba(11,15,20,0.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0d0f11;
+      --surface: #171b1e;
+      --surface-2: #1f242a;
+      --text: #f2f4f6;
+      --text-dim: #a9b3bd;
+      --muted: #7d8791;
+      --border: rgba(255,255,255,0.12);
+      --border-strong: rgba(255,255,255,0.22);
+      --accent: #4c95ea;
+      --accent-ink: #08121c;
+      --chart-surface: #1a1a19;
+      --grid: #2c2c2a;
+      --axis: #45453f;
+      --series-1: #3987e5;
+      --series-2: #d9772f;
+      --series-3: #22b17c;
+      --good: #0ca30c;
+      --critical: #e66767;
+      --warning: #e0a12b;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0d0f11;
+    --surface: #171b1e;
+    --surface-2: #1f242a;
+    --text: #f2f4f6;
+    --text-dim: #a9b3bd;
+    --muted: #7d8791;
+    --border: rgba(255,255,255,0.12);
+    --border-strong: rgba(255,255,255,0.22);
+    --accent: #4c95ea;
+    --accent-ink: #08121c;
+    --chart-surface: #1a1a19;
+    --grid: #2c2c2a;
+    --axis: #45453f;
+    --series-1: #3987e5;
+    --series-2: #d9772f;
+    --series-3: #22b17c;
+    --good: #0ca30c;
+    --critical: #e66767;
+    --warning: #e0a12b;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .num { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  .tabular { font-variant-numeric: tabular-nums; }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 20px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  header.top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  header.top .title-block h1 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  header.top .title-block p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.88rem;
+  }
+  .asof-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-size: 0.76rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+    box-shadow: var(--shadow);
+  }
+  .asof-pill .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--good);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+  }
+
+  /* ---- controls ---- */
+  .controls {
+    padding: 18px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px 18px;
+    align-items: end;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+  .field label {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .field input[type="date"],
+  .field input[type="number"],
+  input.amount-field {
+    font: inherit;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.86rem;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg);
+    color: var(--text);
+    width: 100%;
+  }
+  .field input[type="number"] {
+    font-family: "IBM Plex Mono", monospace;
+  }
+  .date-select-row {
+    display: flex;
+    gap: 6px;
+  }
+  select.date-select {
+    font: inherit;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.86rem;
+    padding: 8px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg);
+    color: var(--text);
+    min-width: 0;
+  }
+  select.date-select.y { flex: 1.3; }
+  select.date-select.m { flex: 1; }
+  select.date-select.d { flex: 1; }
+
+  .amount-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .amount-input .prefix {
+    position: absolute;
+    left: 12px;
+    color: var(--muted);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.86rem;
+    pointer-events: none;
+  }
+  .amount-input .amount-field { padding-left: 28px; }
+
+  .seg {
+    display: inline-flex;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg);
+    width: fit-content;
+  }
+  .seg button {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 8px 14px;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-right: 1px solid var(--border);
+    transition: background 0.12s, color 0.12s;
+  }
+  .seg button:last-child { border-right: none; }
+  .seg button:hover { background: var(--surface-2); }
+  .seg button.active {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+  .seg.wide { width: 100%; }
+  .seg.wide button { flex: 1; text-align: center; }
+
+  .subrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .subrow .subrow-label {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 4px;
+    border-top: 1px solid var(--border);
+  }
+  .toggle-row .toggle-text { display: flex; flex-direction: column; gap: 2px; max-width: 640px; }
+  .toggle-row .toggle-text strong { font-size: 0.86rem; font-weight: 600; }
+  .toggle-row .toggle-text span { font-size: 0.76rem; color: var(--text-dim); line-height: 1.5; }
+
+  .switch {
+    position: relative;
+    width: 42px; height: 24px;
+    flex: none;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .switch.on { background: var(--accent); border-color: var(--accent); }
+  .switch .knob {
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    transition: transform 0.15s;
+  }
+  .switch.on .knob { transform: translateX(18px); }
+
+  .invested-note {
+    font-size: 0.76rem;
+    color: var(--muted);
+  }
+  .invested-note .num { color: var(--text-dim); font-weight: 500; }
+
+  /* ---- summary cards ---- */
+  .fund-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 820px) {
+    .fund-grid { grid-template-columns: 1fr; }
+  }
+  .fund-card {
+    padding: 18px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .fund-card .fund-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .fund-swatch {
+    width: 10px; height: 10px; border-radius: 3px;
+    flex: none;
+  }
+  .fund-head h3 {
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 600;
+  }
+  .lev-chip {
+    margin-left: auto;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--text-dim);
+    font-family: "IBM Plex Mono", monospace;
+  }
+  .fund-value {
+    font-size: 1.65rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .fund-sub {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+  .stat-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    padding: 6px 0;
+    border-top: 1px solid var(--border);
+  }
+  .stat-line .k { color: var(--text-dim); }
+  .stat-line .v { font-family: "IBM Plex Mono", monospace; font-weight: 500; }
+  .pos { color: var(--good); }
+  .neg { color: var(--critical); }
+
+  /* ---- chart card ---- */
+  .chart-card { padding: 18px 20px 12px; }
+  .chart-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .chart-head h2 { margin: 0; font-size: 1rem; font-weight: 600; }
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .legend button {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font: inherit;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 2px;
+  }
+  .legend button.off { opacity: 0.38; }
+  .legend .key {
+    width: 14px; height: 2px; border-radius: 2px;
+  }
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 360px;
+    background: var(--chart-surface);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  canvas#chart { display: block; width: 100%; height: 100%; cursor: crosshair; position: relative; z-index: 1; }
+  canvas#crosshairCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .chart-hint {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .brush-wrap {
+    padding: 14px 16px 2px 64px;
+  }
+  .brush-track {
+    position: relative;
+    height: 22px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+  }
+  .brush-range {
+    position: absolute;
+    top: -1px;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+    border: 1px solid var(--accent);
+    border-radius: 5px;
+    cursor: grab;
+  }
+  .brush-range.dragging { cursor: grabbing; }
+  .brush-handle {
+    position: absolute;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--chart-surface);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+    cursor: ew-resize;
+    touch-action: none;
+  }
+  .brush-handle[data-handle="left"] { left: 0; transform: translate(-50%, -50%); }
+  .brush-handle[data-handle="right"] { left: 100%; transform: translate(-50%, -50%); }
+  .brush-tip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 9px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.1s;
+  }
+  .brush-tip.show { opacity: 1; }
+  .brush-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.68rem;
+    color: var(--muted);
+    font-family: "IBM Plex Mono", monospace;
+    margin-top: 4px;
+  }
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.76rem;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transition: opacity 0.08s;
+    z-index: 5;
+    min-width: 150px;
+  }
+  .tooltip.show { opacity: 1; }
+  .tooltip .tt-date {
+    font-family: "IBM Plex Mono", monospace;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    font-size: 0.72rem;
+  }
+  .tooltip .tt-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: space-between;
+    padding: 2px 0;
+  }
+  .tooltip .tt-row .tt-key { display: flex; align-items: center; gap: 6px; color: var(--text-dim); }
+  .tooltip .tt-line { width: 10px; height: 2px; border-radius: 2px; flex: none; }
+  .tooltip .tt-val { font-family: "IBM Plex Mono", monospace; font-weight: 600; }
+
+  .scale-toggle { display:flex; align-items:center; gap:8px; }
+  .scale-toggle span { font-size: 0.74rem; color: var(--muted); }
+
+  /* ---- stats table ---- */
+  .table-card { padding: 18px 20px 20px; }
+  .table-card h2 { margin: 0 0 12px; font-size: 1rem; font-weight: 600; }
+  .stats-table-wrap { overflow-x: auto; }
+  table.stats {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    min-width: 520px;
+  }
+  table.stats th, table.stats td {
+    text-align: right;
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+    font-family: "IBM Plex Mono", monospace;
+    white-space: nowrap;
+  }
+  table.stats th:first-child, table.stats td:first-child {
+    text-align: left;
+    font-family: "IBM Plex Sans", sans-serif;
+    color: var(--text-dim);
+  }
+  table.stats thead th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  table.stats tbody th {
+    font-weight: 600;
+    color: var(--text);
+  }
+  .th-key {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .th-key .fund-swatch { width: 8px; height: 8px; }
+
+  footer.note {
+    font-size: 0.74rem;
+    color: var(--muted);
+    line-height: 1.7;
+    padding: 4px 4px 0;
+  }
+  footer.note a { color: var(--text-dim); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="index.html">QQQ Leverage Lab</a>
+  <nav>
+    <a href="index.html" aria-current="page">백테스트</a>
+    <a href="about.html">소개</a>
+    <a href="privacy.html">개인정보처리방침</a>
+    <a href="terms.html">이용약관</a>
+  </nav>
+</header>
+
+<div class="wrap">
+  <header class="top">
+    <div class="title-block">
+      <h1>QQQ Leverage Lab</h1>
+      <p>QQQ · QLD · TQQQ 나스닥100 레버리지 ETF 백테스트 — 적립식 매수 시뮬레이션</p>
+    </div>
+    <div class="asof-pill"><span class="dot"></span><span id="asOfText">데이터 로딩 중…</span></div>
+  </header>
+
+  <section class="card controls">
+    <div class="controls-grid">
+      <div class="field">
+        <label>시작일</label>
+        <div class="date-select-row">
+          <select id="startYear" class="date-select y"></select>
+          <select id="startMonth" class="date-select m"></select>
+          <select id="startDay" class="date-select d"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label>종료일</label>
+        <div class="date-select-row">
+          <select id="endYear" class="date-select y"></select>
+          <select id="endMonth" class="date-select m"></select>
+          <select id="endDay" class="date-select d"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label>매수 주기</label>
+        <div class="seg wide" id="freqSeg">
+          <button data-freq="daily">매일</button>
+          <button data-freq="weekly">매주</button>
+          <button data-freq="monthly">매월</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="monthlyAmount">월 환산 투자금액</label>
+        <div class="amount-input">
+          <span class="prefix">$</span>
+          <input type="text" inputmode="numeric" autocomplete="off" id="monthlyAmount" class="amount-field" value="1,000">
+        </div>
+      </div>
+    </div>
+
+    <div class="subrow">
+      <span class="subrow-label">기간 바로가기</span>
+      <div class="seg" id="presetSeg">
+        <button data-preset="1m">최근 1개월</button>
+        <button data-preset="6m">최근 6개월</button>
+        <button data-preset="1y">최근 1년</button>
+        <button data-preset="3y">최근 3년</button>
+        <button data-preset="5y">최근 5년</button>
+        <button data-preset="all">전체 기간</button>
+      </div>
+    </div>
+
+    <div class="subrow" id="weeklySubrow" style="display:none;">
+      <span class="subrow-label">매주 매수 요일</span>
+      <div class="seg" id="weekdaySeg">
+        <button data-wd="1">월</button>
+        <button data-wd="2">화</button>
+        <button data-wd="3">수</button>
+        <button data-wd="4">목</button>
+        <button data-wd="5">금</button>
+      </div>
+    </div>
+    <div class="subrow" id="monthlySubrow" style="display:none;">
+      <span class="subrow-label">매월 매수일</span>
+      <div class="seg" id="monthdaySeg">
+        <button data-md="1">매월 1일</button>
+        <button data-md="15">매월 15일</button>
+        <button data-md="last">매월 말일</button>
+      </div>
+    </div>
+
+    <div class="toggle-row">
+      <div class="toggle-text">
+        <strong>레버리지 비용(운용보수·조달비용) 반영</strong>
+        <span>QLD·TQQQ는 나스닥100(QQQ 실제 수익률) 기반으로 합성됩니다. 켜면 연도별 평균 단기금리(Fed Funds)+0.35%p의 조달비용과 공시 운용보수(QLD 0.95%, TQQQ 0.86%)를 매일 차감해 실제 상품에 가깝게 반영하고, 끄면 순수 배율(2배·3배)만 적용한 이론적 상한을 봅니다.</span>
+      </div>
+      <div class="switch on" id="costToggle" role="switch" aria-checked="true" tabindex="0"><div class="knob"></div></div>
+    </div>
+
+    <div class="invested-note" id="investedNote"></div>
+  </section>
+
+  <section class="fund-grid" id="fundGrid"></section>
+
+  <section class="card chart-card">
+    <div class="chart-head">
+      <h2>평가금액 추이</h2>
+      <div style="display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
+        <div class="legend" id="legend"></div>
+        <span class="chart-hint">아래 눈금의 양쪽 손잡이를 드래그해 기간 조절 · 더블클릭으로 초기화</span>
+        <div class="scale-toggle">
+          <span>스케일</span>
+          <div class="seg" id="scaleSeg">
+            <button data-scale="linear">선형</button>
+            <button data-scale="log">로그</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="chart"></canvas>
+      <canvas id="crosshairCanvas"></canvas>
+      <div class="tooltip" id="tooltip">
+        <div class="tt-date" id="ttDate"></div>
+        <div id="ttRows"></div>
+      </div>
+    </div>
+    <div class="brush-wrap">
+      <div class="brush-track" id="brushTrack">
+        <div class="brush-range" id="brushRange">
+          <div class="brush-handle" id="brushHandleL" data-handle="left">
+            <span class="brush-tip" id="brushTipL"></span>
+          </div>
+          <div class="brush-handle" id="brushHandleR" data-handle="right">
+            <span class="brush-tip" id="brushTipR"></span>
+          </div>
+        </div>
+      </div>
+      <div class="brush-labels">
+        <span id="brushMinLabel"></span>
+        <span id="brushMaxLabel"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card table-card">
+    <h2>상세 지표</h2>
+    <div class="stats-table-wrap">
+      <table class="stats" id="statsTable">
+        <thead>
+          <tr>
+            <th>지표</th>
+            <th>QQQ (1배)</th>
+            <th>QLD (2배)</th>
+            <th>TQQQ (3배)</th>
+          </tr>
+        </thead>
+        <tbody id="statsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="note">
+    QLD·TQQQ는 실제 상장 이전 구간을 포함해 QQQ의 실제 일별 총수익(배당 재투자 반영)에 배율과 비용 가정을 적용해 합성한 값입니다. 실제 상품의 스왑 구조·조달금리·추적오차와는 차이가 있을 수 있으며, 과거 성과가 미래 수익을 보장하지 않습니다. 투자 조언이 아닙니다. 가격 데이터 출처: Yahoo Finance(QQQ, 배당·분할 조정 종가).
+  </footer>
+</div>
+
+<div class="ad-slot"><div class="ad-box">광고</div></div>
+
+<footer class="site-footer">
+  <span>© 2026 QQQ Leverage Lab</span>
+  <nav>
+    <a href="about.html">소개</a>
+    <a href="privacy.html">개인정보처리방침</a>
+    <a href="terms.html">이용약관</a>
+  </nav>
+</footer>
+
+<script>
+const QQQ_RAW = __QQQ_DATA__;
+
+const FED_RATE = {
+  2001:3.89,2002:1.67,2003:1.13,2004:1.35,2005:3.22,2006:4.96,2007:5.02,
+  2008:1.92,2009:0.16,2010:0.18,2011:0.10,2012:0.14,2013:0.11,2014:0.09,
+  2015:0.13,2016:0.40,2017:1.00,2018:1.83,2019:2.16,2020:0.36,2021:0.08,
+  2022:1.68,2023:5.02,2024:5.33,2025:4.20,2026:3.75
+};
+const FIN_SPREAD = 0.0035;
+
+const FUNDS = [
+  { key:'qqq',  label:'QQQ',  leverage:1, expense:0.0020, colorVar:'--series-1' },
+  { key:'qld',  label:'QLD',  leverage:2, expense:0.0095, colorVar:'--series-2' },
+  { key:'tqqq', label:'TQQQ', leverage:3, expense:0.0086, colorVar:'--series-3' },
+];
+
+const EVENTS = [
+  { date: '2001-09-17', label: '9·11 테러 후 재개장 폭락' },
+  { date: '2002-10-09', label: '닷컴버블 최저점' },
+  { date: '2008-09-15', label: '리먼 브라더스 파산' },
+  { date: '2009-03-09', label: '금융위기 최저점' },
+  { date: '2010-05-06', label: '플래시 크래시' },
+  { date: '2011-08-08', label: '미국 신용등급 강등' },
+  { date: '2015-08-24', label: '차이나 블랙먼데이' },
+  { date: '2018-12-24', label: '2018년 12월 급락 저점' },
+  { date: '2020-01-08', label: '미국-이란 군사 긴장 (솔레이마니 보복)' },
+  { date: '2020-02-19', label: '코로나 폭락 시작' },
+  { date: '2020-03-23', label: '코로나 최저점' },
+  { date: '2022-01-03', label: '2022년 약세장 시작' },
+  { date: '2022-02-24', label: '러시아, 우크라이나 침공' },
+  { date: '2022-10-13', label: '2022년 약세장 저점' },
+  { date: '2023-03-10', label: 'SVB 파산 (은행 위기)' },
+  { date: '2025-06-22', label: '미국, 이란 핵시설 공습' },
+];
+
+// ---------- parse base data ----------
+const dates = QQQ_RAW.map(r => r[0]);
+const prices = QQQ_RAW.map(r => r[1]);
+const timestamps = dates.map(d => Date.parse(d + 'T00:00:00Z'));
+const years = dates.map(d => parseInt(d.slice(0,4), 10));
+const N = dates.length;
+
+const qqqRet = new Float64Array(N);
+for (let i = 1; i < N; i++) qqqRet[i] = prices[i] / prices[i-1] - 1;
+
+function computePriceIndex(fund, costOn) {
+  const idx = new Float64Array(N);
+  idx[0] = 1;
+  const lev = fund.leverage;
+  for (let i = 1; i < N; i++) {
+    let r;
+    if (lev === 1) {
+      r = qqqRet[i];
+    } else if (costOn) {
+      const rate = (FED_RATE[years[i]] !== undefined ? FED_RATE[years[i]] : 4.0) / 100;
+      const dailyFinance = (rate + FIN_SPREAD) / 360 * (lev - 1);
+      const dailyExpense = fund.expense / 252;
+      r = lev * qqqRet[i] - dailyExpense - dailyFinance;
+    } else {
+      r = lev * qqqRet[i];
+    }
+    idx[i] = idx[i-1] * (1 + r);
+  }
+  return idx;
+}
+
+function bisectDate(targetTs) {
+  // first index with timestamps[i] >= targetTs
+  let lo = 0, hi = N - 1;
+  if (targetTs <= timestamps[0]) return 0;
+  if (targetTs > timestamps[N-1]) return N;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (timestamps[mid] < targetTs) lo = mid + 1; else hi = mid;
+  }
+  return lo;
+}
+
+function daysInMonth(y, m) { return new Date(Date.UTC(y, m + 1, 0)).getUTCDate(); }
+
+function genContributionIndices(startIdx, endIdx, freq, weekday, monthday) {
+  const out = [];
+  if (freq === 'daily') {
+    for (let i = startIdx; i <= endIdx; i++) out.push(i);
+    return out;
+  }
+  if (freq === 'weekly') {
+    const startD = new Date(timestamps[startIdx]);
+    let cursor = new Date(Date.UTC(startD.getUTCFullYear(), startD.getUTCMonth(), startD.getUTCDate()));
+    const cursorDow = cursor.getUTCDay();
+    let delta = weekday - cursorDow;
+    if (delta < 0) delta += 7;
+    cursor.setUTCDate(cursor.getUTCDate() + delta);
+    while (cursor.getTime() <= timestamps[endIdx]) {
+      const ts = cursor.getTime();
+      const i = bisectDate(ts);
+      if (i <= endIdx && i >= startIdx && timestamps[i] === ts) out.push(i);
+      cursor.setUTCDate(cursor.getUTCDate() + 7);
+    }
+    return out;
+  }
+  // monthly
+  const startD = new Date(timestamps[startIdx]);
+  let y = startD.getUTCFullYear(), m = startD.getUTCMonth();
+  const endD = new Date(timestamps[endIdx]);
+  const seen = new Set();
+  while (y < endD.getUTCFullYear() || (y === endD.getUTCFullYear() && m <= endD.getUTCMonth())) {
+    let day;
+    if (monthday === 'last') day = daysInMonth(y, m);
+    else day = Math.min(monthday, daysInMonth(y, m));
+    const target = Date.UTC(y, m, day);
+    if (target <= timestamps[endIdx]) {
+      const i = bisectDate(target);
+      if (i <= endIdx && i >= startIdx && !seen.has(i)) { out.push(i); seen.add(i); }
+    }
+    m++;
+    if (m > 11) { m = 0; y++; }
+  }
+  return out;
+}
+
+function monthsBetween(startIdx, endIdx) {
+  const s = new Date(timestamps[startIdx]), e = new Date(timestamps[endIdx]);
+  let months = (e.getUTCFullYear() - s.getUTCFullYear()) * 12 + (e.getUTCMonth() - s.getUTCMonth());
+  months += (e.getUTCDate() - s.getUTCDate()) / 30.44;
+  return Math.max(months, 1/30.44);
+}
+
+function xirr(cashflows) {
+  // cashflows: [{t: ms epoch, amount}]
+  const t0 = cashflows[0].t;
+  function npv(rate) {
+    let sum = 0;
+    for (const cf of cashflows) {
+      const yrs = (cf.t - t0) / (365 * 86400000);
+      sum += cf.amount / Math.pow(1 + rate, yrs);
+    }
+    return sum;
+  }
+  let lo = -0.9999, hi = 10;
+  let flo = npv(lo), fhi = npv(hi);
+  if (isNaN(flo) || isNaN(fhi)) return NaN;
+  if (flo * fhi > 0) {
+    // widen search
+    hi = 50;
+    fhi = npv(hi);
+    if (flo * fhi > 0) return NaN;
+  }
+  for (let iter = 0; iter < 100; iter++) {
+    const mid = (lo + hi) / 2;
+    const fm = npv(mid);
+    if (Math.abs(fm) < 1e-6) return mid;
+    if ((flo < 0) === (fm < 0)) { lo = mid; flo = fm; } else { hi = mid; }
+  }
+  return (lo + hi) / 2;
+}
+
+function runBacktest(startIdx, endIdx, freq, weekday, monthday, monthlyAmount, priceIndexByFund) {
+  const contribIdx = genContributionIndices(startIdx, endIdx, freq, weekday, monthday);
+  const months = monthsBetween(startIdx, endIdx);
+  const totalBudget = monthlyAmount * months;
+  const perEvent = contribIdx.length > 0 ? totalBudget / contribIdx.length : 0;
+  const contribSet = contribIdx;
+
+  const results = {};
+  for (const fund of FUNDS) {
+    const priceIndex = priceIndexByFund[fund.key];
+    let shares = 0;
+    const series = new Float64Array(endIdx - startIdx + 1);
+    const cashflows = [];
+    let ci = 0;
+    let peak = -Infinity, mdd = 0;
+    for (let i = startIdx; i <= endIdx; i++) {
+      if (ci < contribSet.length && contribSet[ci] === i) {
+        shares += perEvent / priceIndex[i];
+        cashflows.push({ t: timestamps[i], amount: -perEvent });
+        ci++;
+      }
+      const val = shares * priceIndex[i];
+      series[i - startIdx] = val;
+      if (val > peak) peak = val;
+      if (peak > 0) {
+        const dd = (val - peak) / peak;
+        if (dd < mdd) mdd = dd;
+      }
+    }
+    const finalValue = series[series.length - 1];
+    const investedTotal = perEvent * contribIdx.length;
+    if (cashflows.length > 0) cashflows.push({ t: timestamps[endIdx], amount: finalValue });
+    const irr = cashflows.length > 1 ? xirr(cashflows) : NaN;
+
+    // annualized volatility over the window, from fund's own daily returns
+    let sum = 0, sumsq = 0, cnt = 0;
+    for (let i = Math.max(startIdx,1); i <= endIdx; i++) {
+      const r = priceIndex[i] / priceIndex[i-1] - 1;
+      sum += r; sumsq += r*r; cnt++;
+    }
+    const mean = sum / cnt;
+    const variance = sumsq / cnt - mean * mean;
+    const vol = Math.sqrt(Math.max(variance,0)) * Math.sqrt(252);
+
+    results[fund.key] = {
+      series, finalValue, investedTotal, totalReturnPct: investedTotal > 0 ? (finalValue - investedTotal) / investedTotal * 100 : 0,
+      irr, mdd, vol, perEvent, contribCount: contribIdx.length
+    };
+  }
+  return { results, totalBudget, months, contribCount: contribIdx.length };
+}
+
+// ---------- formatting ----------
+const fmtUSD = (v, digits=0) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+const fmtUSDCompact = (v) => {
+  const sign = v < 0 ? '-' : '';
+  const av = Math.abs(v);
+  if (av >= 1e9) return sign + '$' + (av/1e9).toFixed(2) + 'B';
+  if (av >= 1e6) return sign + '$' + (av/1e6).toFixed(2) + 'M';
+  if (av >= 1e3) return sign + '$' + (av/1e3).toFixed(1) + 'K';
+  return sign + '$' + av.toFixed(0);
+};
+const fmtPct = (v, digits=1) => (v > 0 ? '+' : '') + v.toFixed(digits) + '%';
+
+// ---------- state ----------
+const state = {
+  freq: 'monthly',
+  weekday: 1,
+  monthday: 1,
+  costOn: true,
+  scale: 'linear',
+  visible: { qqq: true, qld: true, tqqq: true },
+};
+
+const minDate = dates[0];
+const maxDate = dates[N-1];
+const minYear = parseInt(minDate.slice(0,4), 10);
+const maxYear = parseInt(maxDate.slice(0,4), 10);
+document.getElementById('asOfText').textContent = '데이터 기준 ' + maxDate + ' 종가 · ' + minDate + '부터 이용 가능';
+
+function refreshDaySelect(prefix) {
+  const yearSel = document.getElementById(prefix + 'Year');
+  const monthSel = document.getElementById(prefix + 'Month');
+  const daySel = document.getElementById(prefix + 'Day');
+  const y = parseInt(yearSel.value, 10), m = parseInt(monthSel.value, 10);
+  const dim = daysInMonth(y, m - 1);
+  const prevVal = parseInt(daySel.value, 10) || 1;
+  daySel.innerHTML = '';
+  for (let d = 1; d <= dim; d++) {
+    const opt = document.createElement('option');
+    opt.value = String(d);
+    opt.textContent = d + '일';
+    daySel.appendChild(opt);
+  }
+  daySel.value = String(Math.min(prevVal, dim));
+}
+
+function populateDateSelect(prefix) {
+  const yearSel = document.getElementById(prefix + 'Year');
+  const monthSel = document.getElementById(prefix + 'Month');
+  const daySel = document.getElementById(prefix + 'Day');
+  yearSel.innerHTML = '';
+  for (let y = minYear; y <= maxYear; y++) {
+    const opt = document.createElement('option');
+    opt.value = String(y);
+    opt.textContent = y + '년';
+    yearSel.appendChild(opt);
+  }
+  monthSel.innerHTML = '';
+  for (let m = 1; m <= 12; m++) {
+    const opt = document.createElement('option');
+    opt.value = String(m);
+    opt.textContent = m + '월';
+    monthSel.appendChild(opt);
+  }
+  refreshDaySelect(prefix);
+  yearSel.addEventListener('change', () => { refreshDaySelect(prefix); update(); });
+  monthSel.addEventListener('change', () => { refreshDaySelect(prefix); update(); });
+  daySel.addEventListener('change', update);
+}
+
+function getDateValue(prefix) {
+  const y = document.getElementById(prefix + 'Year').value;
+  const m = String(document.getElementById(prefix + 'Month').value).padStart(2, '0');
+  const d = String(document.getElementById(prefix + 'Day').value).padStart(2, '0');
+  return y + '-' + m + '-' + d;
+}
+
+function setDateSelectValue(prefix, iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  document.getElementById(prefix + 'Year').value = String(y);
+  document.getElementById(prefix + 'Month').value = String(m);
+  refreshDaySelect(prefix);
+  document.getElementById(prefix + 'Day').value = String(d);
+}
+
+populateDateSelect('start');
+populateDateSelect('end');
+
+function defaultStart() {
+  const end = new Date(maxDate + 'T00:00:00Z');
+  const s = new Date(Date.UTC(end.getUTCFullYear() - 20, end.getUTCMonth(), end.getUTCDate()));
+  const iso = s.toISOString().slice(0,10);
+  return iso < minDate ? minDate : iso;
+}
+setDateSelectValue('start', defaultStart());
+setDateSelectValue('end', maxDate);
+
+function presetStartIso(preset) {
+  if (preset === 'all') return minDate;
+  const n = parseInt(preset, 10);
+  const unit = preset.slice(-1);
+  const end = new Date(maxDate + 'T00:00:00Z');
+  const s = unit === 'm'
+    ? new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth() - n, end.getUTCDate()))
+    : new Date(Date.UTC(end.getUTCFullYear() - n, end.getUTCMonth(), end.getUTCDate()));
+  const iso = s.toISOString().slice(0,10);
+  return iso < minDate ? minDate : iso;
+}
+function applyPreset(preset) {
+  setDateSelectValue('start', presetStartIso(preset));
+  setDateSelectValue('end', maxDate);
+  update();
+}
+function syncPresetActive() {
+  const curStart = getDateValue('start');
+  const curEnd = getDateValue('end');
+  let matched = null;
+  if (curEnd === maxDate) {
+    for (const btn of document.querySelectorAll('#presetSeg button')) {
+      if (presetStartIso(btn.dataset.preset) === curStart) { matched = btn.dataset.preset; break; }
+    }
+  }
+  document.querySelectorAll('#presetSeg button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.preset === matched);
+  });
+}
+document.querySelectorAll('#presetSeg button').forEach(btn => {
+  btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+});
+
+// ---------- range brush ----------
+const fullDataT0 = timestamps[0], fullDataT1 = timestamps[N - 1];
+const brushMinFrac = (14 * 86400000) / (fullDataT1 - fullDataT0);
+const brushTrack = document.getElementById('brushTrack');
+const brushRange = document.getElementById('brushRange');
+const brushHandleL = document.getElementById('brushHandleL');
+const brushHandleR = document.getElementById('brushHandleR');
+const brushTipL = document.getElementById('brushTipL');
+const brushTipR = document.getElementById('brushTipR');
+document.getElementById('brushMinLabel').textContent = minDate;
+document.getElementById('brushMaxLabel').textContent = maxDate;
+
+function tsToFrac(ts) { return (ts - fullDataT0) / (fullDataT1 - fullDataT0); }
+function fracToIso(frac) { return new Date(fullDataT0 + frac * (fullDataT1 - fullDataT0)).toISOString().slice(0, 10); }
+
+function renderBrush() {
+  const startTs = Date.parse(getDateValue('start') + 'T00:00:00Z');
+  const endTs = Date.parse(getDateValue('end') + 'T00:00:00Z');
+  const fL = Math.min(Math.max(tsToFrac(startTs), 0), 1);
+  const fR = Math.min(Math.max(tsToFrac(endTs), 0), 1);
+  brushRange.style.left = (fL * 100) + '%';
+  brushRange.style.right = ((1 - fR) * 100) + '%';
+}
+
+let brushDrag = null;
+let brushRaf = null;
+
+function brushPointerMove(e) {
+  if (!brushDrag) return;
+  const rect = brushTrack.getBoundingClientRect();
+  const dxFrac = (e.clientX - brushDrag.startClientX) / rect.width;
+  let newL = brushDrag.fracL, newR = brushDrag.fracR;
+  if (brushDrag.type === 'left') {
+    newL = Math.min(Math.max(brushDrag.fracL + dxFrac, 0), brushDrag.fracR - brushMinFrac);
+  } else if (brushDrag.type === 'right') {
+    newR = Math.max(Math.min(brushDrag.fracR + dxFrac, 1), brushDrag.fracL + brushMinFrac);
+  } else {
+    const width = brushDrag.fracR - brushDrag.fracL;
+    newL = Math.min(Math.max(brushDrag.fracL + dxFrac, 0), 1 - width);
+    newR = newL + width;
+  }
+  const startIso = fracToIso(newL), endIso = fracToIso(newR);
+  setDateSelectValue('start', startIso);
+  setDateSelectValue('end', endIso);
+  brushRange.style.left = (newL * 100) + '%';
+  brushRange.style.right = ((1 - newR) * 100) + '%';
+  brushTipL.textContent = startIso;
+  brushTipR.textContent = endIso;
+  if (!brushRaf) brushRaf = requestAnimationFrame(() => { brushRaf = null; update(); });
+}
+
+function brushPointerUp() {
+  brushDrag = null;
+  brushRange.classList.remove('dragging');
+  brushTipL.classList.remove('show');
+  brushTipR.classList.remove('show');
+  document.removeEventListener('pointermove', brushPointerMove);
+  document.removeEventListener('pointerup', brushPointerUp);
+}
+
+function brushPointerDown(type, e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const startTs = Date.parse(getDateValue('start') + 'T00:00:00Z');
+  const endTs = Date.parse(getDateValue('end') + 'T00:00:00Z');
+  brushDrag = { type, startClientX: e.clientX, fracL: tsToFrac(startTs), fracR: tsToFrac(endTs) };
+  if (type === 'pan') brushRange.classList.add('dragging');
+  if (type === 'left' || type === 'pan') brushTipL.classList.add('show');
+  if (type === 'right' || type === 'pan') brushTipR.classList.add('show');
+  brushTipL.textContent = getDateValue('start');
+  brushTipR.textContent = getDateValue('end');
+  document.addEventListener('pointermove', brushPointerMove);
+  document.addEventListener('pointerup', brushPointerUp);
+}
+
+brushHandleL.addEventListener('pointerdown', (e) => brushPointerDown('left', e));
+brushHandleR.addEventListener('pointerdown', (e) => brushPointerDown('right', e));
+brushRange.addEventListener('pointerdown', (e) => {
+  if (e.target === brushHandleL || e.target === brushHandleR) return;
+  brushPointerDown('pan', e);
+});
+
+function setSeg(containerId, attr, value, onSelect) {
+  const el = document.getElementById(containerId);
+  el.querySelectorAll('button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset[attr] === String(value));
+    btn.onclick = () => onSelect(btn.dataset[attr]);
+  });
+}
+
+let priceIndexByFund = {};
+function recomputePriceIndex() {
+  priceIndexByFund = {};
+  for (const fund of FUNDS) priceIndexByFund[fund.key] = computePriceIndex(fund, state.costOn);
+}
+
+function css(varName) { return getComputedStyle(document.documentElement).getPropertyValue(varName).trim(); }
+
+let lastResult = null;
+let lastStartIdx = 0, lastEndIdx = 0;
+
+function update() {
+  const startVal = getDateValue('start');
+  const endVal = getDateValue('end');
+  let startIdx = bisectDate(Date.parse(startVal + 'T00:00:00Z'));
+  let endIdx = bisectDate(Date.parse(endVal + 'T00:00:00Z'));
+  if (endIdx >= N) endIdx = N - 1;
+  if (startIdx > endIdx) startIdx = endIdx;
+  lastStartIdx = startIdx; lastEndIdx = endIdx;
+
+  const monthlyAmount = Math.max(1, parseFloat(document.getElementById('monthlyAmount').value.replace(/,/g, '')) || 0);
+
+  const bt = runBacktest(startIdx, endIdx, state.freq, state.weekday, state.monthday, monthlyAmount, priceIndexByFund);
+  lastResult = bt;
+
+  const freqLabel = state.freq === 'daily' ? '매일' : state.freq === 'weekly' ? '매주' : '매월';
+  document.getElementById('investedNote').innerHTML =
+    '월 ' + fmtUSD(monthlyAmount) + ' 기준 · 선택 기간 ' + bt.months.toFixed(1) + '개월 · ' +
+    '<span class="num">총 투자원금 ' + fmtUSD(bt.totalBudget) + '</span> · ' +
+    freqLabel + ' 매수 ' + bt.contribCount + '회 (회당 <span class="num">' + fmtUSD(bt.results.qqq.perEvent, 2) + '</span>) — ' +
+    '매일/매주/매월 어느 주기를 선택해도 같은 기간의 총 투자원금은 동일합니다.';
+
+  renderCards(bt);
+  renderTable(bt);
+  drawChart(bt, startIdx, endIdx);
+  renderBrush();
+  syncPresetActive();
+}
+
+function renderCards(bt) {
+  const grid = document.getElementById('fundGrid');
+  grid.innerHTML = '';
+  for (const fund of FUNDS) {
+    const r = bt.results[fund.key];
+    const retClass = r.totalReturnPct >= 0 ? 'pos' : 'neg';
+    const irrText = isNaN(r.irr) ? '—' : fmtPct(r.irr * 100, 1);
+    const card = document.createElement('div');
+    card.className = 'card fund-card';
+    card.innerHTML =
+      '<div class="fund-head">' +
+        '<span class="fund-swatch" style="background:var(' + fund.colorVar + ')"></span>' +
+        '<h3>' + fund.label + '</h3>' +
+        '<span class="lev-chip">' + fund.leverage + '배' + (fund.leverage>1?' · 합성':'') + '</span>' +
+      '</div>' +
+      '<div>' +
+        '<div class="fund-value tabular">' + fmtUSDCompact(r.finalValue) + '</div>' +
+        '<div class="fund-sub">최종 평가금액 · 원금 ' + fmtUSDCompact(r.investedTotal) + '</div>' +
+      '</div>' +
+      '<div>' +
+        '<div class="stat-line"><span class="k">총수익률</span><span class="v ' + retClass + '">' + fmtPct(r.totalReturnPct,1) + '</span></div>' +
+        '<div class="stat-line"><span class="k">연환산수익률(IRR)</span><span class="v ' + (r.irr>=0?'pos':'neg') + '">' + irrText + '</span></div>' +
+        '<div class="stat-line"><span class="k">최대낙폭(MDD)</span><span class="v neg">' + fmtPct(r.mdd*100,1) + '</span></div>' +
+        '<div class="stat-line"><span class="k">연율화 변동성</span><span class="v">' + (r.vol*100).toFixed(1) + '%</span></div>' +
+      '</div>';
+    grid.appendChild(card);
+  }
+}
+
+function renderTable(bt) {
+  const rows = [
+    { key: 'finalValue', label: '최종 평가금액', fmt: v => fmtUSD(v) },
+    { key: 'investedTotal', label: '총 투자원금', fmt: v => fmtUSD(v) },
+    { key: 'totalReturnPct', label: '총수익률', fmt: v => fmtPct(v,1), signed: true },
+    { key: 'irr', label: '연환산수익률 (IRR)', fmt: v => isNaN(v) ? '—' : fmtPct(v*100,1), signed: true, raw: true },
+    { key: 'mdd', label: '최대낙폭 (MDD)', fmt: v => fmtPct(v*100,1), neg: true, raw: true },
+    { key: 'vol', label: '연율화 변동성', fmt: v => (v*100).toFixed(1) + '%', raw: true },
+  ];
+  const body = document.getElementById('statsBody');
+  body.innerHTML = '';
+  for (const row of rows) {
+    const tr = document.createElement('tr');
+    let cells = '<th>' + row.label + '</th>';
+    for (const fund of FUNDS) {
+      const r = bt.results[fund.key];
+      let val = r[row.key];
+      let cls = '';
+      if (row.neg) cls = 'neg';
+      else if (row.signed) cls = val >= 0 ? 'pos' : 'neg';
+      cells += '<td class="' + cls + '">' + row.fmt(val) + '</td>';
+    }
+    tr.innerHTML = cells;
+    body.appendChild(tr);
+  }
+}
+
+// ---------- chart ----------
+const canvas = document.getElementById('chart');
+const ctx = canvas.getContext('2d');
+const crossCanvas = document.getElementById('crosshairCanvas');
+const crossCtx = crossCanvas.getContext('2d');
+const tooltipEl = document.getElementById('tooltip');
+const ttDate = document.getElementById('ttDate');
+const ttRows = document.getElementById('ttRows');
+let chartDims = { W: 0, H: 0 };
+
+function clearCrosshair() { crossCtx.clearRect(0, 0, chartDims.W, chartDims.H); }
+
+function drawCrosshairLine(x, padT, plotH, points) {
+  clearCrosshair();
+  crossCtx.strokeStyle = css('--axis');
+  crossCtx.lineWidth = 1;
+  crossCtx.beginPath();
+  crossCtx.moveTo(Math.round(x) + 0.5, padT);
+  crossCtx.lineTo(Math.round(x) + 0.5, padT + plotH);
+  crossCtx.stroke();
+  for (const p of points) {
+    crossCtx.fillStyle = css('--chart-surface');
+    crossCtx.beginPath(); crossCtx.arc(p.x, p.y, 5, 0, Math.PI*2); crossCtx.fill();
+    crossCtx.fillStyle = p.color;
+    crossCtx.beginPath(); crossCtx.arc(p.x, p.y, 3.5, 0, Math.PI*2); crossCtx.fill();
+  }
+}
+
+function niceStep(range, targetTicks) {
+  const rough = range / targetTicks;
+  const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+  const norm = rough / mag;
+  let step;
+  if (norm < 1.5) step = 1;
+  else if (norm < 3) step = 2;
+  else if (norm < 7) step = 5;
+  else step = 10;
+  return step * mag;
+}
+
+let chartLayout = null;
+
+function drawChart(bt, startIdx, endIdx) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const W = rect.width, H = rect.height;
+  chartDims = { W, H };
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  crossCanvas.width = W * dpr;
+  crossCanvas.height = H * dpr;
+  crossCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  crossCtx.clearRect(0, 0, W, H);
+
+  const padL = 64, padR = 16, padT = 16, padB = 28;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+
+  const visibleFunds = FUNDS.filter(f => state.visible[f.key]);
+  if (visibleFunds.length === 0) { chartLayout = null; return; }
+
+  let minV = Infinity, maxV = -Infinity;
+  for (const fund of visibleFunds) {
+    const s = bt.results[fund.key].series;
+    for (let i = 0; i < s.length; i++) {
+      const v = s[i];
+      if (v <= 0 && state.scale === 'log') continue;
+      if (v < minV) minV = v;
+      if (v > maxV) maxV = v;
+    }
+  }
+  if (!isFinite(minV) || !isFinite(maxV)) { chartLayout = null; return; }
+  if (state.scale === 'linear') {
+    minV = Math.min(0, minV);
+  }
+
+  const t0 = timestamps[startIdx], t1 = timestamps[endIdx];
+  const xOf = (i) => padL + (timestamps[i] - t0) / (t1 - t0 || 1) * plotW;
+
+  let yOf, yTicks;
+  if (state.scale === 'log') {
+    const lo = Math.log10(Math.max(minV, 1));
+    const hi = Math.log10(maxV);
+    yOf = (v) => padT + plotH - (Math.log10(Math.max(v,1)) - lo) / ((hi - lo) || 1) * plotH;
+    yTicks = [];
+    const p0 = Math.floor(lo), p1 = Math.ceil(hi);
+    for (let p = p0; p <= p1; p++) {
+      for (const mult of [1,2,5]) {
+        const v = mult * Math.pow(10, p);
+        if (v >= Math.pow(10,lo) && v <= Math.pow(10,hi)) yTicks.push(v);
+      }
+    }
+  } else {
+    const step = niceStep(maxV - minV, 5);
+    const niceMin = Math.floor(minV / step) * step;
+    const niceMax = Math.ceil(maxV / step) * step;
+    yOf = (v) => padT + plotH - (v - niceMin) / ((niceMax - niceMin) || 1) * plotH;
+    yTicks = [];
+    for (let v = niceMin; v <= niceMax + 1e-9; v += step) yTicks.push(v);
+  }
+
+  // gridlines
+  ctx.strokeStyle = css('--grid');
+  ctx.lineWidth = 1;
+  ctx.font = '11px "IBM Plex Mono", monospace';
+  ctx.fillStyle = css('--muted');
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (const v of yTicks) {
+    const y = yOf(v);
+    if (y < padT - 1 || y > padT + plotH + 1) continue;
+    ctx.beginPath();
+    ctx.moveTo(padL, Math.round(y) + 0.5);
+    ctx.lineTo(padL + plotW, Math.round(y) + 0.5);
+    ctx.stroke();
+    ctx.fillText(fmtUSDCompact(v), padL - 8, y);
+  }
+
+  // x axis ticks
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.strokeStyle = css('--axis');
+  ctx.beginPath();
+  ctx.moveTo(padL, padT + plotH + 0.5);
+  ctx.lineTo(padL + plotW, padT + plotH + 0.5);
+  ctx.stroke();
+
+  const rangeDays = (t1 - t0) / 86400000;
+  if (rangeDays <= 760) {
+    // month-level ticks (used when zoomed in)
+    const sD = new Date(t0), eD = new Date(t1);
+    const totalMonths = (eD.getUTCFullYear() - sD.getUTCFullYear()) * 12 + (eD.getUTCMonth() - sD.getUTCMonth());
+    const monthStep = totalMonths > 36 ? 6 : totalMonths > 18 ? 3 : totalMonths > 8 ? 2 : 1;
+    let cy = sD.getUTCFullYear(), cm = sD.getUTCMonth();
+    cm -= cm % monthStep;
+    let guard = 0;
+    while (guard++ < 80) {
+      const ts = Date.UTC(cy, cm, 1);
+      if (ts > t1) break;
+      if (ts >= t0) {
+        const x = padL + (ts - t0) / (t1 - t0) * plotW;
+        ctx.strokeStyle = css('--grid');
+        ctx.beginPath();
+        ctx.moveTo(Math.round(x)+0.5, padT);
+        ctx.lineTo(Math.round(x)+0.5, padT + plotH);
+        ctx.stroke();
+        ctx.fillStyle = css('--muted');
+        ctx.fillText(cy + '-' + String(cm+1).padStart(2,'0'), x, padT + plotH + 6);
+      }
+      cm += monthStep;
+      while (cm > 11) { cm -= 12; cy++; }
+    }
+  } else {
+    const startYear = new Date(t0).getUTCFullYear();
+    const endYear = new Date(t1).getUTCFullYear();
+    const yearSpan = endYear - startYear;
+    const yearStep = yearSpan > 16 ? 4 : yearSpan > 8 ? 2 : 1;
+    for (let y = startYear; y <= endYear; y++) {
+      if ((y - startYear) % yearStep !== 0) continue;
+      const ts = Date.UTC(y, 0, 1);
+      if (ts < t0 || ts > t1) continue;
+      const x = padL + (ts - t0) / (t1 - t0) * plotW;
+      ctx.strokeStyle = css('--grid');
+      ctx.beginPath();
+      ctx.moveTo(Math.round(x)+0.5, padT);
+      ctx.lineTo(Math.round(x)+0.5, padT + plotH);
+      ctx.stroke();
+      ctx.fillStyle = css('--muted');
+      ctx.fillText(String(y), x, padT + plotH + 6);
+    }
+  }
+
+  // lines (clipped to the plot area so zoomed edges don't bleed into the gutters)
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(padL, padT, plotW, plotH);
+  ctx.clip();
+  for (const fund of visibleFunds) {
+    const s = bt.results[fund.key].series;
+    ctx.strokeStyle = css(fund.colorVar);
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    let started = false;
+    for (let i = startIdx; i <= endIdx; i++) {
+      const v = s[i - startIdx];
+      if (state.scale === 'log' && v <= 0) continue;
+      const x = xOf(i), y = yOf(v);
+      if (!started) { ctx.moveTo(x, y); started = true; } else { ctx.lineTo(x, y); }
+    }
+    ctx.stroke();
+
+    // end marker
+    const lastV = s[s.length - 1];
+    if (!(state.scale === 'log' && lastV <= 0)) {
+      const x = xOf(endIdx), y = yOf(lastV);
+      ctx.fillStyle = css('--chart-surface');
+      ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = css(fund.colorVar);
+      ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI*2); ctx.fill();
+    }
+  }
+  ctx.restore();
+
+  // event markers on the axis
+  const axisY = padT + plotH;
+  const eventMarkers = [];
+  for (const ev of EVENTS) {
+    const ts = Date.parse(ev.date + 'T00:00:00Z');
+    if (ts < t0 || ts > t1) continue;
+    const x = padL + (ts - t0) / (t1 - t0 || 1) * plotW;
+    eventMarkers.push({ x, y: axisY, date: ev.date, label: ev.label });
+  }
+  function diamondPath(cctx, cx, cy, r) {
+    cctx.beginPath();
+    cctx.moveTo(cx, cy - r);
+    cctx.lineTo(cx + r, cy);
+    cctx.lineTo(cx, cy + r);
+    cctx.lineTo(cx - r, cy);
+    cctx.closePath();
+  }
+  for (const m of eventMarkers) {
+    ctx.fillStyle = css('--chart-surface');
+    diamondPath(ctx, m.x, m.y, 7.5); ctx.fill();
+    ctx.fillStyle = css('--critical');
+    diamondPath(ctx, m.x, m.y, 5); ctx.fill();
+  }
+
+  chartLayout = { padL, padT, plotW, plotH, t0, t1, xOf, yOf, startIdx, endIdx, bt, visibleFunds, eventMarkers };
+}
+
+canvas.addEventListener('mousemove', (e) => {
+  if (!chartLayout) return;
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const { padL, padT, plotW, plotH, t0, t1, startIdx, endIdx, bt, visibleFunds, eventMarkers, yOf } = chartLayout;
+
+  for (const m of eventMarkers) {
+    const dx = mx - m.x, dy = my - m.y;
+    if (dx * dx + dy * dy <= 100) {
+      clearCrosshair();
+      ttDate.textContent = m.date;
+      ttRows.innerHTML = '';
+      const row = document.createElement('div');
+      row.className = 'tt-row';
+      const keyEl = document.createElement('span');
+      keyEl.className = 'tt-key';
+      keyEl.style.color = 'var(--text)';
+      keyEl.textContent = m.label;
+      row.appendChild(keyEl);
+      ttRows.appendChild(row);
+      tooltipEl.style.left = Math.min(Math.max(m.x - 75, 4), rect.width - 168) + 'px';
+      tooltipEl.style.top = Math.max(m.y - 66, 4) + 'px';
+      tooltipEl.classList.add('show');
+      return;
+    }
+  }
+
+  if (mx < padL || mx > padL + plotW) { tooltipEl.classList.remove('show'); clearCrosshair(); return; }
+  const frac = (mx - padL) / plotW;
+  const targetTs = t0 + frac * (t1 - t0);
+  let i = bisectDate(targetTs);
+  if (i < startIdx) i = startIdx;
+  if (i > endIdx) i = endIdx;
+  if (i > startIdx && Math.abs(timestamps[i-1] - targetTs) < Math.abs(timestamps[i] - targetTs)) i--;
+
+  ttDate.textContent = dates[i];
+  let rowsHtml = '';
+  const crossPoints = [];
+  for (const fund of FUNDS) {
+    const active = visibleFunds.includes(fund);
+    const v = bt.results[fund.key].series[i - startIdx];
+    rowsHtml += '<div class="tt-row" style="' + (active?'':'opacity:.35') + '">' +
+      '<span class="tt-key"><span class="tt-line" style="background:var(' + fund.colorVar + ')"></span>' + fund.label + '</span>' +
+      '<span class="tt-val">' + fmtUSDCompact(v) + '</span></div>';
+    if (active && !(state.scale === 'log' && v <= 0)) {
+      crossPoints.push({ x: chartLayout.xOf(i), y: yOf(v), color: css(fund.colorVar) });
+    }
+  }
+  ttRows.innerHTML = rowsHtml;
+
+  const x = chartLayout.xOf(i);
+  drawCrosshairLine(x, padT, plotH, crossPoints);
+  tooltipEl.style.left = Math.min(Math.max(x + 12, 4), rect.width - 168) + 'px';
+  tooltipEl.style.top = '10px';
+  tooltipEl.classList.add('show');
+});
+canvas.addEventListener('mouseleave', () => { tooltipEl.classList.remove('show'); clearCrosshair(); });
+
+canvas.addEventListener('dblclick', () => applyPreset('all'));
+
+function renderLegend() {
+  const legend = document.getElementById('legend');
+  legend.innerHTML = '';
+  for (const fund of FUNDS) {
+    const btn = document.createElement('button');
+    btn.className = state.visible[fund.key] ? '' : 'off';
+    btn.innerHTML = '<span class="key" style="background:var(' + fund.colorVar + ')"></span>' + fund.label + ' (' + fund.leverage + '배)';
+    btn.onclick = () => {
+      state.visible[fund.key] = !state.visible[fund.key];
+      renderLegend();
+      if (lastResult) drawChart(lastResult, lastStartIdx, lastEndIdx);
+    };
+    legend.appendChild(btn);
+  }
+}
+renderLegend();
+
+// ---------- wiring ----------
+let amtTimer;
+const amountEl = document.getElementById('monthlyAmount');
+amountEl.addEventListener('input', () => {
+  const cursorPos = amountEl.selectionStart;
+  const digitsBeforeCursor = amountEl.value.slice(0, cursorPos).replace(/\D/g, '').length;
+  const allDigits = amountEl.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+  const formatted = allDigits ? parseInt(allDigits, 10).toLocaleString('en-US') : '';
+  amountEl.value = formatted;
+
+  let count = 0, newPos = formatted.length;
+  for (let i = 0; i < formatted.length; i++) {
+    if (/\d/.test(formatted[i])) count++;
+    if (count === digitsBeforeCursor) { newPos = i + 1; break; }
+  }
+  if (digitsBeforeCursor === 0) newPos = 0;
+  amountEl.setSelectionRange(newPos, newPos);
+
+  clearTimeout(amtTimer);
+  amtTimer = setTimeout(update, 220);
+});
+
+function selectFreq(v) {
+  state.freq = v;
+  document.getElementById('weeklySubrow').style.display = v === 'weekly' ? 'flex' : 'none';
+  document.getElementById('monthlySubrow').style.display = v === 'monthly' ? 'flex' : 'none';
+  setSeg('freqSeg', 'freq', state.freq, selectFreq);
+  update();
+}
+setSeg('freqSeg', 'freq', state.freq, selectFreq);
+
+function selectWeekday(v) {
+  state.weekday = parseInt(v, 10);
+  setSeg('weekdaySeg', 'wd', state.weekday, selectWeekday);
+  update();
+}
+setSeg('weekdaySeg', 'wd', state.weekday, selectWeekday);
+
+function selectMonthday(v) {
+  state.monthday = v === 'last' ? 'last' : parseInt(v, 10);
+  setSeg('monthdaySeg', 'md', state.monthday, selectMonthday);
+  update();
+}
+setSeg('monthdaySeg', 'md', state.monthday, selectMonthday);
+
+function selectScale(v) {
+  state.scale = v;
+  setSeg('scaleSeg', 'scale', state.scale, selectScale);
+  if (lastResult) drawChart(lastResult, lastStartIdx, lastEndIdx);
+}
+setSeg('scaleSeg', 'scale', state.scale, selectScale);
+
+document.getElementById('weeklySubrow').style.display = state.freq === 'weekly' ? 'flex' : 'none';
+document.getElementById('monthlySubrow').style.display = state.freq === 'monthly' ? 'flex' : 'none';
+
+const costToggleEl = document.getElementById('costToggle');
+function setCostToggle(on) {
+  state.costOn = on;
+  costToggleEl.classList.toggle('on', on);
+  costToggleEl.setAttribute('aria-checked', String(on));
+  recomputePriceIndex();
+  update();
+}
+costToggleEl.addEventListener('click', () => setCostToggle(!state.costOn));
+costToggleEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCostToggle(!state.costOn); }
+});
+
+window.addEventListener('resize', () => { if (lastResult) drawChart(lastResult, lastStartIdx, lastEndIdx); });
+
+recomputePriceIndex();
+update();
+</script>
+</body>
+</html>

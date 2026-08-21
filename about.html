@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소개 및 방법론 — QQQ Leverage Lab</title>
+<meta name="description" content="QQQ Leverage Lab이 QQQ·QLD·TQQQ 백테스트를 계산하는 방식과 데이터 출처, 가정을 설명합니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">QQQ Leverage Lab</a>
+    <nav>
+      <a href="index.html">백테스트</a>
+      <a href="about.html" aria-current="page">소개</a>
+      <a href="privacy.html">개인정보처리방침</a>
+      <a href="terms.html">이용약관</a>
+    </nav>
+  </header>
+
+  <main class="prose">
+    <h1>소개 및 방법론</h1>
+    <p class="updated">최종 수정일: 2026년 8월 21일</p>
+
+    <h2>이 사이트는 무엇인가요?</h2>
+    <p>QQQ Leverage Lab은 나스닥100 지수를 추종하는 QQQ와, 이를 2배·3배로 추종하는 레버리지 ETF인 QLD·TQQQ에 매일/매주/매월 적립식으로 투자했을 때의 결과를 과거 데이터로 시뮬레이션하는 무료 도구입니다. 최대 25년치 데이터로 백테스트할 수 있으며, 매수 금액과 주기, 기간을 자유롭게 조절할 수 있습니다.</p>
+
+    <h2>데이터 출처</h2>
+    <p>가격 데이터는 <strong>Yahoo Finance</strong>가 제공하는 QQQ의 배당·분할 조정 종가(adjusted close)를 사용합니다. 이 값은 실제 배당금을 재투자했다고 가정했을 때의 총수익 기준 가격이며, QQQ 자체의 운용보수(0.20%)가 이미 반영되어 있습니다.</p>
+
+    <h2>QLD·TQQQ는 어떻게 계산하나요?</h2>
+    <p>QLD(2배)와 TQQQ(3배)는 실제 상장일(각각 2006년, 2010년) 이전 구간에서는 존재하지 않았기 때문에, 해당 기간까지 포함해 <strong>QQQ의 실제 일별 수익률에 배율을 곱하는 방식으로 합성</strong>합니다. 실제 레버리지 ETF와 마찬가지로 매일 배율이 재조정(daily reset)된다고 가정하며, 이 과정에서 변동성이 큰 구간의 복리 효과(변동성 감쇠)가 자연스럽게 반영됩니다.</p>
+    <p>"비용 반영" 옵션을 켜면 다음 두 가지를 매일 차감합니다.</p>
+    <ul>
+      <li><strong>운용보수</strong>: QLD 연 0.95%, TQQQ 연 0.86% (공시 기준)</li>
+      <li><strong>레버리지 조달비용</strong>: 연도별 평균 Fed Funds 금리 + 0.35%p 스프레드를 배율 초과분(QLD는 1배분, TQQQ는 2배분)에 대해 근사 적용</li>
+    </ul>
+    <p>옵션을 끄면 비용 없이 배율만 적용한 이론적 상한값을 보여줍니다.</p>
+
+    <h2>적립식 매수 계산 방식</h2>
+    <p>매일/매주/매월 중 어떤 주기를 선택해도 선택한 기간의 <strong>총 투자원금은 동일</strong>하도록, "월 환산 투자금액 × 개월 수"를 총예산으로 두고 이를 매수 횟수만큼 균등 분할합니다. 최종 평가금액, 총수익률, 연환산수익률(XIRR 기준 내부수익률), 최대낙폭(MDD), 연율화 변동성을 함께 제공합니다.</p>
+
+    <h2>한계와 가정</h2>
+    <ul>
+      <li>조달금리는 연도별 평균치의 근사값이며, 실제 상품이 매일 지불하는 스왑·선물 조달비용과는 차이가 있을 수 있습니다.</li>
+      <li>세금, 매매 슬리피지, 매수·매도 스프레드는 반영하지 않습니다.</li>
+      <li>과거 성과는 미래 수익을 보장하지 않으며, 이 도구는 투자 조언이 아닙니다. 자세한 내용은 <a href="terms.html">이용약관</a>을 참고해 주세요.</li>
+    </ul>
+
+    <h2>문의</h2>
+    <p>오류 제보나 문의사항은 <a href="mailto:contact@nasdaq100backtest.com">contact@nasdaq100backtest.com</a>으로 보내주세요.</p>
+  </main>
+
+  <div class="ad-slot"><div class="ad-box">광고</div></div>
+
+  <footer class="site-footer">
+    <span>© 2026 QQQ Leverage Lab</span>
+    <nav>
+      <a href="about.html">소개</a>
+      <a href="privacy.html">개인정보처리방침</a>
+      <a href="terms.html">이용약관</a>
+    </nav>
+  </footer>
+</body>
+</html>
