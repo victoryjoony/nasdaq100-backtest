@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nasdaq100backtest.github.io/sitemap.xml
