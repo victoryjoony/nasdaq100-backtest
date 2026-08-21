@@ -1009,6 +1009,8 @@ function renderAsOf() {
 }
 renderAsOf();
 
+const MONTH_NAMES_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
 function refreshDaySelect(prefix) {
   const yearSel = document.getElementById(prefix + 'Year');
   const monthSel = document.getElementById(prefix + 'Month');
@@ -1016,11 +1018,12 @@ function refreshDaySelect(prefix) {
   const y = parseInt(yearSel.value, 10), m = parseInt(monthSel.value, 10);
   const dim = daysInMonth(y, m - 1);
   const prevVal = parseInt(daySel.value, 10) || 1;
+  const en = curLang() === 'en';
   daySel.innerHTML = '';
   for (let d = 1; d <= dim; d++) {
     const opt = document.createElement('option');
     opt.value = String(d);
-    opt.textContent = d + '일';
+    opt.textContent = en ? String(d) : (d + '일');
     daySel.appendChild(opt);
   }
   daySel.value = String(Math.min(prevVal, dim));
@@ -1030,24 +1033,40 @@ function populateDateSelect(prefix) {
   const yearSel = document.getElementById(prefix + 'Year');
   const monthSel = document.getElementById(prefix + 'Month');
   const daySel = document.getElementById(prefix + 'Day');
+  const en = curLang() === 'en';
+  const prevY = yearSel.value, prevM = monthSel.value;
   yearSel.innerHTML = '';
   for (let y = minYear; y <= maxYear; y++) {
     const opt = document.createElement('option');
     opt.value = String(y);
-    opt.textContent = y + '년';
+    opt.textContent = en ? String(y) : (y + '년');
     yearSel.appendChild(opt);
   }
+  if (prevY) yearSel.value = prevY;
   monthSel.innerHTML = '';
   for (let m = 1; m <= 12; m++) {
     const opt = document.createElement('option');
     opt.value = String(m);
-    opt.textContent = m + '월';
+    opt.textContent = en ? MONTH_NAMES_EN[m-1] : (m + '월');
     monthSel.appendChild(opt);
   }
+  if (prevM) monthSel.value = prevM;
   refreshDaySelect(prefix);
   yearSel.addEventListener('change', () => { refreshDaySelect(prefix); update(); });
   monthSel.addEventListener('change', () => { refreshDaySelect(prefix); update(); });
   daySel.addEventListener('change', update);
+}
+
+function relabelDateSelects() {
+  const en = curLang() === 'en';
+  ['start', 'end'].forEach((prefix) => {
+    const yearSel = document.getElementById(prefix + 'Year');
+    const monthSel = document.getElementById(prefix + 'Month');
+    const daySel = document.getElementById(prefix + 'Day');
+    Array.from(yearSel.options).forEach((opt) => { opt.textContent = en ? opt.value : (opt.value + '년'); });
+    Array.from(monthSel.options).forEach((opt) => { opt.textContent = en ? MONTH_NAMES_EN[parseInt(opt.value, 10) - 1] : (opt.value + '월'); });
+    Array.from(daySel.options).forEach((opt) => { opt.textContent = en ? opt.value : (opt.value + '일'); });
+  });
 }
 
 function getDateValue(prefix) {
@@ -1700,6 +1719,7 @@ recomputePriceIndex();
 update();
 
 document.addEventListener('langchange', () => {
+  relabelDateSelects();
   renderAsOf();
   renderLegend();
   update();
