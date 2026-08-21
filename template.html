@@ -3,10 +3,10 @@
 <head>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5607384951754093" crossorigin="anonymous"></script>
 <meta charset="utf-8">
-<script>(function(){var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);})();</script>
+<script>(function(){var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);var l=localStorage.getItem('lang');if(!(l==='ko'||l==='en'))l='en';document.documentElement.setAttribute('data-lang',l);document.documentElement.setAttribute('lang',l);})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QQQ Leverage Lab — 나스닥100 레버리지 ETF 백테스트</title>
-<meta name="description" content="QQQ·QLD·TQQQ 나스닥100 레버리지 ETF에 매일/매주/매월 적립식으로 투자했을 때의 결과를 최대 25년치 실데이터로 백테스트해보세요.">
+<title data-i18n="tool.title">QQQ Leverage Lab — 나스닥100 레버리지 ETF 백테스트</title>
+<meta name="description" content="QQQ·QLD·TQQQ 나스닥100 레버리지 ETF에 매일/매주/매월 적립식으로 투자했을 때의 결과를 최대 25년치 실데이터로 백테스트해보세요." data-i18n-attr="content:tool.metaDesc">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -580,12 +580,13 @@
   <a class="brand" href="index.html">QQQ Leverage Lab</a>
   <div class="header-right">
     <nav>
-    <a href="index.html" aria-current="page">백테스트</a>
-    <a href="about.html">소개</a>
-    <a href="privacy.html">개인정보처리방침</a>
-    <a href="terms.html">이용약관</a>
+    <a href="index.html" aria-current="page" data-i18n="nav.backtest">백테스트</a>
+    <a href="about.html" data-i18n="nav.about">소개</a>
+    <a href="privacy.html" data-i18n="nav.privacy">개인정보처리방침</a>
+    <a href="terms.html" data-i18n="nav.terms">이용약관</a>
   </nav>
-    <button class="theme-toggle" id="themeToggle" type="button" aria-label="다크모드 전환">
+    <button class="lang-toggle" id="langToggle" type="button" aria-label="Toggle language">EN</button>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="다크모드 전환" data-i18n-attr="aria-label:theme.toggle">
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
     </button>
@@ -596,15 +597,15 @@
   <header class="top">
     <div class="title-block">
       <h1>QQQ Leverage Lab</h1>
-      <p>QQQ · QLD · TQQQ 나스닥100 레버리지 ETF 백테스트 — 적립식 매수 시뮬레이션</p>
+      <p data-i18n="tool.subtitle">QQQ · QLD · TQQQ 나스닥100 레버리지 ETF 백테스트 — 적립식 매수 시뮬레이션</p>
     </div>
-    <div class="asof-pill"><span class="dot"></span><span id="asOfText">데이터 로딩 중…</span></div>
+    <div class="asof-pill"><span class="dot"></span><span id="asOfText" data-i18n="tool.loading">데이터 로딩 중…</span></div>
   </header>
 
   <section class="card controls">
     <div class="controls-grid">
       <div class="field">
-        <label>시작일</label>
+        <label data-i18n="tool.startDate">시작일</label>
         <div class="date-select-row">
           <select id="startYear" class="date-select y"></select>
           <select id="startMonth" class="date-select m"></select>
@@ -612,7 +613,7 @@
         </div>
       </div>
       <div class="field">
-        <label>종료일</label>
+        <label data-i18n="tool.endDate">종료일</label>
         <div class="date-select-row">
           <select id="endYear" class="date-select y"></select>
           <select id="endMonth" class="date-select m"></select>
@@ -620,15 +621,15 @@
         </div>
       </div>
       <div class="field">
-        <label>매수 주기</label>
+        <label data-i18n="tool.freq">매수 주기</label>
         <div class="seg wide" id="freqSeg">
-          <button data-freq="daily">매일</button>
-          <button data-freq="weekly">매주</button>
-          <button data-freq="monthly">매월</button>
+          <button data-freq="daily" data-i18n="tool.daily">매일</button>
+          <button data-freq="weekly" data-i18n="tool.weekly">매주</button>
+          <button data-freq="monthly" data-i18n="tool.monthly">매월</button>
         </div>
       </div>
       <div class="field">
-        <label for="monthlyAmount">월 환산 투자금액</label>
+        <label for="monthlyAmount" data-i18n="tool.amount">월 환산 투자금액</label>
         <div class="amount-input">
           <span class="prefix">$</span>
           <input type="text" inputmode="numeric" autocomplete="off" id="monthlyAmount" class="amount-field" value="1,000">
@@ -637,40 +638,40 @@
     </div>
 
     <div class="subrow">
-      <span class="subrow-label">기간 바로가기</span>
+      <span class="subrow-label" data-i18n="tool.presets">기간 바로가기</span>
       <div class="seg" id="presetSeg">
-        <button data-preset="1m">최근 1개월</button>
-        <button data-preset="6m">최근 6개월</button>
-        <button data-preset="1y">최근 1년</button>
-        <button data-preset="3y">최근 3년</button>
-        <button data-preset="5y">최근 5년</button>
-        <button data-preset="all">전체 기간</button>
+        <button data-preset="1m" data-i18n="tool.preset1m">최근 1개월</button>
+        <button data-preset="6m" data-i18n="tool.preset6m">최근 6개월</button>
+        <button data-preset="1y" data-i18n="tool.preset1y">최근 1년</button>
+        <button data-preset="3y" data-i18n="tool.preset3y">최근 3년</button>
+        <button data-preset="5y" data-i18n="tool.preset5y">최근 5년</button>
+        <button data-preset="all" data-i18n="tool.presetAll">전체 기간</button>
       </div>
     </div>
 
     <div class="subrow" id="weeklySubrow" style="display:none;">
-      <span class="subrow-label">매주 매수 요일</span>
+      <span class="subrow-label" data-i18n="tool.weeklyDay">매주 매수 요일</span>
       <div class="seg" id="weekdaySeg">
-        <button data-wd="1">월</button>
-        <button data-wd="2">화</button>
-        <button data-wd="3">수</button>
-        <button data-wd="4">목</button>
-        <button data-wd="5">금</button>
+        <button data-wd="1" data-i18n="tool.mon">월</button>
+        <button data-wd="2" data-i18n="tool.tue">화</button>
+        <button data-wd="3" data-i18n="tool.wed">수</button>
+        <button data-wd="4" data-i18n="tool.thu">목</button>
+        <button data-wd="5" data-i18n="tool.fri">금</button>
       </div>
     </div>
     <div class="subrow" id="monthlySubrow" style="display:none;">
-      <span class="subrow-label">매월 매수일</span>
+      <span class="subrow-label" data-i18n="tool.monthlyDay">매월 매수일</span>
       <div class="seg" id="monthdaySeg">
-        <button data-md="1">매월 1일</button>
-        <button data-md="15">매월 15일</button>
-        <button data-md="last">매월 말일</button>
+        <button data-md="1" data-i18n="tool.md1">매월 1일</button>
+        <button data-md="15" data-i18n="tool.md15">매월 15일</button>
+        <button data-md="last" data-i18n="tool.mdLast">매월 말일</button>
       </div>
     </div>
 
     <div class="toggle-row">
       <div class="toggle-text">
-        <strong>레버리지 비용(운용보수·조달비용) 반영</strong>
-        <span>QLD·TQQQ는 나스닥100(QQQ 실제 수익률) 기반으로 합성됩니다. 켜면 연도별 평균 단기금리(Fed Funds)+0.35%p의 조달비용과 공시 운용보수(QLD 0.95%, TQQQ 0.86%)를 매일 차감해 실제 상품에 가깝게 반영하고, 끄면 순수 배율(2배·3배)만 적용한 이론적 상한을 봅니다.</span>
+        <strong data-i18n="tool.costTitle">레버리지 비용(운용보수·조달비용) 반영</strong>
+        <span data-i18n="tool.costDesc">QLD·TQQQ는 나스닥100(QQQ 실제 수익률) 기반으로 합성됩니다. 켜면 연도별 평균 단기금리(Fed Funds)+0.35%p의 조달비용과 공시 운용보수(QLD 0.95%, TQQQ 0.86%)를 매일 차감해 실제 상품에 가깝게 반영하고, 끄면 순수 배율(2배·3배)만 적용한 이론적 상한을 봅니다.</span>
       </div>
       <div class="switch on" id="costToggle" role="switch" aria-checked="true" tabindex="0"><div class="knob"></div></div>
     </div>
@@ -682,15 +683,15 @@
 
   <section class="card chart-card">
     <div class="chart-head">
-      <h2>평가금액 추이</h2>
+      <h2 data-i18n="tool.chartTitle">평가금액 추이</h2>
       <div style="display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
         <div class="legend" id="legend"></div>
-        <span class="chart-hint">아래 눈금의 양쪽 손잡이를 드래그해 기간 조절 · 더블클릭으로 초기화</span>
+        <span class="chart-hint" data-i18n="tool.chartHint">아래 눈금의 양쪽 손잡이를 드래그해 기간 조절 · 더블클릭으로 초기화</span>
         <div class="scale-toggle">
-          <span>스케일</span>
+          <span data-i18n="tool.scale">스케일</span>
           <div class="seg" id="scaleSeg">
-            <button data-scale="linear">선형</button>
-            <button data-scale="log">로그</button>
+            <button data-scale="linear" data-i18n="tool.linear">선형</button>
+            <button data-scale="log" data-i18n="tool.log">로그</button>
           </div>
         </div>
       </div>
@@ -722,15 +723,15 @@
   </section>
 
   <section class="card table-card">
-    <h2>상세 지표</h2>
+    <h2 data-i18n="tool.detailTitle">상세 지표</h2>
     <div class="stats-table-wrap">
       <table class="stats" id="statsTable">
         <thead>
           <tr>
-            <th>지표</th>
-            <th>QQQ (1배)</th>
-            <th>QLD (2배)</th>
-            <th>TQQQ (3배)</th>
+            <th data-i18n="tool.metric">지표</th>
+            <th>QQQ (1<span data-i18n="tool.x">배</span>)</th>
+            <th>QLD (2<span data-i18n="tool.x">배</span>)</th>
+            <th>TQQQ (3<span data-i18n="tool.x">배</span>)</th>
           </tr>
         </thead>
         <tbody id="statsBody"></tbody>
@@ -738,19 +739,17 @@
     </div>
   </section>
 
-  <footer class="note">
+  <footer class="note" data-i18n="tool.footerNote">
     QLD·TQQQ는 실제 상장 이전 구간을 포함해 QQQ의 실제 일별 총수익(배당 재투자 반영)에 배율과 비용 가정을 적용해 합성한 값입니다. 실제 상품의 스왑 구조·조달금리·추적오차와는 차이가 있을 수 있으며, 과거 성과가 미래 수익을 보장하지 않습니다. 투자 조언이 아닙니다. 가격 데이터 출처: Yahoo Finance(QQQ, 배당·분할 조정 종가).
   </footer>
 </div>
 
-<div class="ad-slot"><div class="ad-box">광고</div></div>
-
 <footer class="site-footer">
-  <span>© 2026 QQQ Leverage Lab</span>
+  <span data-i18n="footer.copyright">© 2026 QQQ Leverage Lab</span>
   <nav>
-    <a href="about.html">소개</a>
-    <a href="privacy.html">개인정보처리방침</a>
-    <a href="terms.html">이용약관</a>
+    <a href="about.html" data-i18n="nav.about">소개</a>
+    <a href="privacy.html" data-i18n="nav.privacy">개인정보처리방침</a>
+    <a href="terms.html" data-i18n="nav.terms">이용약관</a>
   </nav>
 </footer>
 
@@ -772,23 +771,27 @@ const FUNDS = [
 ];
 
 const EVENTS = [
-  { date: '2001-09-17', label: '9·11 테러 후 재개장 폭락' },
-  { date: '2002-10-09', label: '닷컴버블 최저점' },
-  { date: '2008-09-15', label: '리먼 브라더스 파산' },
-  { date: '2009-03-09', label: '금융위기 최저점' },
-  { date: '2010-05-06', label: '플래시 크래시' },
-  { date: '2011-08-08', label: '미국 신용등급 강등' },
-  { date: '2015-08-24', label: '차이나 블랙먼데이' },
-  { date: '2018-12-24', label: '2018년 12월 급락 저점' },
-  { date: '2020-01-08', label: '미국-이란 군사 긴장 (솔레이마니 보복)' },
-  { date: '2020-02-19', label: '코로나 폭락 시작' },
-  { date: '2020-03-23', label: '코로나 최저점' },
-  { date: '2022-01-03', label: '2022년 약세장 시작' },
-  { date: '2022-02-24', label: '러시아, 우크라이나 침공' },
-  { date: '2022-10-13', label: '2022년 약세장 저점' },
-  { date: '2023-03-10', label: 'SVB 파산 (은행 위기)' },
-  { date: '2025-06-22', label: '미국, 이란 핵시설 공습' },
+  { date: '2001-09-17', label: '9·11 테러 후 재개장 폭락', labelEn: '9/11 reopening crash' },
+  { date: '2002-10-09', label: '닷컴버블 최저점', labelEn: 'Dot-com bust low' },
+  { date: '2008-09-15', label: '리먼 브라더스 파산', labelEn: 'Lehman Brothers collapse' },
+  { date: '2009-03-09', label: '금융위기 최저점', labelEn: 'Financial crisis low' },
+  { date: '2010-05-06', label: '플래시 크래시', labelEn: 'Flash Crash' },
+  { date: '2011-08-08', label: '미국 신용등급 강등', labelEn: 'US credit downgrade' },
+  { date: '2015-08-24', label: '차이나 블랙먼데이', labelEn: 'China Black Monday' },
+  { date: '2018-12-24', label: '2018년 12월 급락 저점', labelEn: 'Dec 2018 selloff low' },
+  { date: '2020-01-08', label: '미국-이란 군사 긴장 (솔레이마니 보복)', labelEn: 'US-Iran tensions (Soleimani retaliation)' },
+  { date: '2020-02-19', label: '코로나 폭락 시작', labelEn: 'COVID crash begins' },
+  { date: '2020-03-23', label: '코로나 최저점', labelEn: 'COVID crash low' },
+  { date: '2022-01-03', label: '2022년 약세장 시작', labelEn: '2022 bear market begins' },
+  { date: '2022-02-24', label: '러시아, 우크라이나 침공', labelEn: 'Russia invades Ukraine' },
+  { date: '2022-10-13', label: '2022년 약세장 저점', labelEn: '2022 bear market low' },
+  { date: '2023-03-10', label: 'SVB 파산 (은행 위기)', labelEn: 'SVB collapse (banking crisis)' },
+  { date: '2025-06-22', label: '미국, 이란 핵시설 공습', labelEn: 'US strikes Iranian nuclear sites' },
 ];
+
+function curLang() {
+  return document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'ko';
+}
 
 // ---------- parse base data ----------
 const dates = QQQ_RAW.map(r => r[0]);
@@ -990,7 +993,12 @@ const minDate = dates[0];
 const maxDate = dates[N-1];
 const minYear = parseInt(minDate.slice(0,4), 10);
 const maxYear = parseInt(maxDate.slice(0,4), 10);
-document.getElementById('asOfText').textContent = '데이터 기준 ' + maxDate + ' 종가 · ' + minDate + '부터 이용 가능';
+function renderAsOf() {
+  document.getElementById('asOfText').textContent = curLang() === 'en'
+    ? 'Data as of ' + maxDate + ' close · available from ' + minDate
+    : '데이터 기준 ' + maxDate + ' 종가 · ' + minDate + '부터 이용 가능';
+}
+renderAsOf();
 
 function refreshDaySelect(prefix) {
   const yearSel = document.getElementById(prefix + 'Year');
@@ -1208,12 +1216,21 @@ function update() {
   const bt = runBacktest(startIdx, endIdx, state.freq, state.weekday, state.monthday, monthlyAmount, priceIndexByFund);
   lastResult = bt;
 
-  const freqLabel = state.freq === 'daily' ? '매일' : state.freq === 'weekly' ? '매주' : '매월';
-  document.getElementById('investedNote').innerHTML =
-    '월 ' + fmtUSD(monthlyAmount) + ' 기준 · 선택 기간 ' + bt.months.toFixed(1) + '개월 · ' +
-    '<span class="num">총 투자원금 ' + fmtUSD(bt.totalBudget) + '</span> · ' +
-    freqLabel + ' 매수 ' + bt.contribCount + '회 (회당 <span class="num">' + fmtUSD(bt.results.qqq.perEvent, 2) + '</span>) — ' +
-    '매일/매주/매월 어느 주기를 선택해도 같은 기간의 총 투자원금은 동일합니다.';
+  if (curLang() === 'en') {
+    const freqLabel = state.freq === 'daily' ? 'Daily' : state.freq === 'weekly' ? 'Weekly' : 'Monthly';
+    document.getElementById('investedNote').innerHTML =
+      'Based on ' + fmtUSD(monthlyAmount) + '/mo · ' + bt.months.toFixed(1) + ' months selected · ' +
+      '<span class="num">total invested ' + fmtUSD(bt.totalBudget) + '</span> · ' +
+      freqLabel + ' contributions × ' + bt.contribCount + ' (<span class="num">' + fmtUSD(bt.results.qqq.perEvent, 2) + '</span> each) — ' +
+      'total invested is identical no matter which frequency you pick for the same date range.';
+  } else {
+    const freqLabel = state.freq === 'daily' ? '매일' : state.freq === 'weekly' ? '매주' : '매월';
+    document.getElementById('investedNote').innerHTML =
+      '월 ' + fmtUSD(monthlyAmount) + ' 기준 · 선택 기간 ' + bt.months.toFixed(1) + '개월 · ' +
+      '<span class="num">총 투자원금 ' + fmtUSD(bt.totalBudget) + '</span> · ' +
+      freqLabel + ' 매수 ' + bt.contribCount + '회 (회당 <span class="num">' + fmtUSD(bt.results.qqq.perEvent, 2) + '</span>) — ' +
+      '매일/매주/매월 어느 주기를 선택해도 같은 기간의 총 투자원금은 동일합니다.';
+  }
 
   renderCards(bt);
   renderTable(bt);
@@ -1223,6 +1240,10 @@ function update() {
 }
 
 function renderCards(bt) {
+  const en = curLang() === 'en';
+  const L = en
+    ? { x: 'x', synth: ' · Synthetic', final: 'Final value · principal ', totalRet: 'Total return', irr: 'Annualized return (IRR)', mdd: 'Max drawdown (MDD)', vol: 'Annualized volatility' }
+    : { x: '배', synth: ' · 합성', final: '최종 평가금액 · 원금 ', totalRet: '총수익률', irr: '연환산수익률(IRR)', mdd: '최대낙폭(MDD)', vol: '연율화 변동성' };
   const grid = document.getElementById('fundGrid');
   grid.innerHTML = '';
   for (const fund of FUNDS) {
@@ -1235,24 +1256,31 @@ function renderCards(bt) {
       '<div class="fund-head">' +
         '<span class="fund-swatch" style="background:var(' + fund.colorVar + ')"></span>' +
         '<h3>' + fund.label + '</h3>' +
-        '<span class="lev-chip">' + fund.leverage + '배' + (fund.leverage>1?' · 합성':'') + '</span>' +
+        '<span class="lev-chip">' + fund.leverage + L.x + (fund.leverage>1?L.synth:'') + '</span>' +
       '</div>' +
       '<div>' +
         '<div class="fund-value tabular">' + fmtUSDCompact(r.finalValue) + '</div>' +
-        '<div class="fund-sub">최종 평가금액 · 원금 ' + fmtUSDCompact(r.investedTotal) + '</div>' +
+        '<div class="fund-sub">' + L.final + fmtUSDCompact(r.investedTotal) + '</div>' +
       '</div>' +
       '<div>' +
-        '<div class="stat-line"><span class="k">총수익률</span><span class="v ' + retClass + '">' + fmtPct(r.totalReturnPct,1) + '</span></div>' +
-        '<div class="stat-line"><span class="k">연환산수익률(IRR)</span><span class="v ' + (r.irr>=0?'pos':'neg') + '">' + irrText + '</span></div>' +
-        '<div class="stat-line"><span class="k">최대낙폭(MDD)</span><span class="v neg">' + fmtPct(r.mdd*100,1) + '</span></div>' +
-        '<div class="stat-line"><span class="k">연율화 변동성</span><span class="v">' + (r.vol*100).toFixed(1) + '%</span></div>' +
+        '<div class="stat-line"><span class="k">' + L.totalRet + '</span><span class="v ' + retClass + '">' + fmtPct(r.totalReturnPct,1) + '</span></div>' +
+        '<div class="stat-line"><span class="k">' + L.irr + '</span><span class="v ' + (r.irr>=0?'pos':'neg') + '">' + irrText + '</span></div>' +
+        '<div class="stat-line"><span class="k">' + L.mdd + '</span><span class="v neg">' + fmtPct(r.mdd*100,1) + '</span></div>' +
+        '<div class="stat-line"><span class="k">' + L.vol + '</span><span class="v">' + (r.vol*100).toFixed(1) + '%</span></div>' +
       '</div>';
     grid.appendChild(card);
   }
 }
 
 function renderTable(bt) {
-  const rows = [
+  const rows = curLang() === 'en' ? [
+    { key: 'finalValue', label: 'Final value', fmt: v => fmtUSD(v) },
+    { key: 'investedTotal', label: 'Total invested', fmt: v => fmtUSD(v) },
+    { key: 'totalReturnPct', label: 'Total return', fmt: v => fmtPct(v,1), signed: true },
+    { key: 'irr', label: 'Annualized return (IRR)', fmt: v => isNaN(v) ? '—' : fmtPct(v*100,1), signed: true, raw: true },
+    { key: 'mdd', label: 'Max drawdown (MDD)', fmt: v => fmtPct(v*100,1), neg: true, raw: true },
+    { key: 'vol', label: 'Annualized volatility', fmt: v => (v*100).toFixed(1) + '%', raw: true },
+  ] : [
     { key: 'finalValue', label: '최종 평가금액', fmt: v => fmtUSD(v) },
     { key: 'investedTotal', label: '총 투자원금', fmt: v => fmtUSD(v) },
     { key: 'totalReturnPct', label: '총수익률', fmt: v => fmtPct(v,1), signed: true },
@@ -1491,7 +1519,7 @@ function drawChart(bt, startIdx, endIdx) {
     const ts = Date.parse(ev.date + 'T00:00:00Z');
     if (ts < t0 || ts > t1) continue;
     const x = padL + (ts - t0) / (t1 - t0 || 1) * plotW;
-    eventMarkers.push({ x, y: axisY, date: ev.date, label: ev.label });
+    eventMarkers.push({ x, y: axisY, date: ev.date, label: curLang() === 'en' ? ev.labelEn : ev.label });
   }
   function diamondPath(cctx, cx, cy, r) {
     cctx.beginPath();
@@ -1578,7 +1606,7 @@ function renderLegend() {
   for (const fund of FUNDS) {
     const btn = document.createElement('button');
     btn.className = state.visible[fund.key] ? '' : 'off';
-    btn.innerHTML = '<span class="key" style="background:var(' + fund.colorVar + ')"></span>' + fund.label + ' (' + fund.leverage + '배)';
+    btn.innerHTML = '<span class="key" style="background:var(' + fund.colorVar + ')"></span>' + fund.label + ' (' + fund.leverage + (curLang() === 'en' ? 'x' : '배') + ')';
     btn.onclick = () => {
       state.visible[fund.key] = !state.visible[fund.key];
       renderLegend();
@@ -1661,7 +1689,15 @@ window.addEventListener('resize', () => { if (lastResult) drawChart(lastResult, 
 
 recomputePriceIndex();
 update();
+
+document.addEventListener('langchange', () => {
+  renderAsOf();
+  renderLegend();
+  update();
+});
 </script>
+<script src="assets/i18n-dict.js" defer></script>
+<script src="assets/i18n.js" defer></script>
 <script src="assets/theme.js" defer></script>
 </body>
 </html>

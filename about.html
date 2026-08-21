@@ -3,10 +3,10 @@
 <head>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5607384951754093" crossorigin="anonymous"></script>
 <meta charset="utf-8">
-<script>(function(){var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);})();</script>
+<script>(function(){var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);var l=localStorage.getItem('lang');if(!(l==='ko'||l==='en'))l='en';document.documentElement.setAttribute('data-lang',l);document.documentElement.setAttribute('lang',l);})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>소개 및 방법론 — QQQ Leverage Lab</title>
-<meta name="description" content="QQQ Leverage Lab이 QQQ·QLD·TQQQ 백테스트를 계산하는 방식과 데이터 출처, 가정을 설명합니다.">
+<title data-i18n="about.title">소개 및 방법론 — QQQ Leverage Lab</title>
+<meta name="description" content="QQQ Leverage Lab이 QQQ·QLD·TQQQ 백테스트를 계산하는 방식과 데이터 출처, 가정을 설명합니다." data-i18n-attr="content:about.metaDesc">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,12 +17,13 @@
     <a class="brand" href="index.html">QQQ Leverage Lab</a>
     <div class="header-right">
     <nav>
-      <a href="index.html">백테스트</a>
-      <a href="about.html" aria-current="page">소개</a>
-      <a href="privacy.html">개인정보처리방침</a>
-      <a href="terms.html">이용약관</a>
+      <a href="index.html" data-i18n="nav.backtest">백테스트</a>
+      <a href="about.html" aria-current="page" data-i18n="nav.about">소개</a>
+      <a href="privacy.html" data-i18n="nav.privacy">개인정보처리방침</a>
+      <a href="terms.html" data-i18n="nav.terms">이용약관</a>
     </nav>
-    <button class="theme-toggle" id="themeToggle" type="button" aria-label="다크모드 전환">
+    <button class="lang-toggle" id="langToggle" type="button" aria-label="Toggle language">EN</button>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="다크모드 전환" data-i18n-attr="aria-label:theme.toggle">
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
     </button>
@@ -30,6 +31,7 @@
   </header>
 
   <main class="prose">
+  <div data-i18n-block="ko">
     <h1>소개 및 방법론</h1>
     <p class="updated">최종 수정일: 2026년 8월 21일</p>
 
@@ -60,18 +62,51 @@
 
     <h2>문의</h2>
     <p>오류 제보나 문의사항은 <a href="mailto:contact@nasdaq100backtest.com">contact@nasdaq100backtest.com</a>으로 보내주세요.</p>
+  </div>
+  <div data-i18n-block="en" hidden>
+    <h1>About &amp; Methodology</h1>
+    <p class="updated">Last updated: August 21, 2026</p>
+
+    <h2>What is this site?</h2>
+    <p>QQQ Leverage Lab is a free tool that simulates dollar-cost-averaging into QQQ (which tracks the Nasdaq-100) and its 2x/3x leveraged counterparts, QLD and TQQQ, on a daily, weekly, or monthly schedule using historical data. You can backtest up to 25 years of history, with full control over contribution amount, frequency, and date range.</p>
+
+    <h2>Data source</h2>
+    <p>Price data comes from <strong>Yahoo Finance</strong>'s dividend- and split-adjusted closing prices for QQQ. This reflects total return assuming dividends are reinvested, and already accounts for QQQ's own 0.20% expense ratio.</p>
+
+    <h2>How are QLD and TQQQ calculated?</h2>
+    <p>QLD (2x) and TQQQ (3x) didn't exist before their actual listing dates (2006 and 2010, respectively), so for periods before that, we <strong>synthesize returns by applying the leverage multiple to QQQ's actual daily return</strong>. As with real leveraged ETFs, we assume daily reset compounding, which naturally captures volatility decay during choppy periods.</p>
+    <p>When the "include costs" option is on, two things are deducted daily:</p>
+    <ul>
+      <li><strong>Expense ratio</strong>: 0.95%/yr for QLD, 0.86%/yr for TQQQ (per each fund's prospectus)</li>
+      <li><strong>Leverage financing cost</strong>: an approximation using the year's average Fed Funds rate + a 0.35pp spread, applied to the leveraged portion (1x for QLD, 2x for TQQQ)</li>
+    </ul>
+    <p>Turning the option off shows the theoretical ceiling — pure multiple, no costs.</p>
+
+    <h2>How contributions are calculated</h2>
+    <p>Whichever frequency you choose — daily, weekly, or monthly — the <strong>total amount invested stays identical</strong> for a given date range: we treat "monthly-equivalent amount × number of months" as the total budget and split it evenly across however many contribution events that frequency produces. Results include final value, total return, annualized return (XIRR-based internal rate of return), max drawdown (MDD), and annualized volatility.</p>
+
+    <h2>Limitations &amp; assumptions</h2>
+    <ul>
+      <li>The financing rate is an approximate yearly average and will differ from the actual daily swap/futures financing cost a real fund pays.</li>
+      <li>Taxes, slippage, and bid-ask spreads are not modeled.</li>
+      <li>Past performance does not guarantee future results, and this tool is not investment advice. See the <a href="terms.html">Terms of Use</a> for details.</li>
+    </ul>
+
+    <h2>Contact</h2>
+    <p>For bug reports or questions, email <a href="mailto:contact@nasdaq100backtest.com">contact@nasdaq100backtest.com</a>.</p>
+  </div>
   </main>
 
-  <div class="ad-slot"><div class="ad-box">광고</div></div>
-
   <footer class="site-footer">
-    <span>© 2026 QQQ Leverage Lab</span>
+    <span data-i18n="footer.copyright">© 2026 QQQ Leverage Lab</span>
     <nav>
-      <a href="about.html">소개</a>
-      <a href="privacy.html">개인정보처리방침</a>
-      <a href="terms.html">이용약관</a>
+      <a href="about.html" data-i18n="nav.about">소개</a>
+      <a href="privacy.html" data-i18n="nav.privacy">개인정보처리방침</a>
+      <a href="terms.html" data-i18n="nav.terms">이용약관</a>
     </nav>
   </footer>
+<script src="assets/i18n-dict.js" defer></script>
+<script src="assets/i18n.js" defer></script>
 <script src="assets/theme.js" defer></script>
 </body>
 </html>

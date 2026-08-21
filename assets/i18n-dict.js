@@ -1,0 +1,63 @@
+window.I18N = {
+  'nav.backtest': { ko: '백테스트', en: 'Backtest' },
+  'nav.about': { ko: '소개', en: 'About' },
+  'nav.privacy': { ko: '개인정보처리방침', en: 'Privacy Policy' },
+  'nav.terms': { ko: '이용약관', en: 'Terms' },
+  'footer.copyright': { ko: '© 2026 QQQ Leverage Lab', en: '© 2026 QQQ Leverage Lab' },
+  'theme.toggle': { ko: '다크모드 전환', en: 'Toggle dark mode' },
+
+  'tool.title': { ko: 'QQQ Leverage Lab — 나스닥100 레버리지 ETF 백테스트', en: 'QQQ Leverage Lab — Nasdaq-100 Leveraged ETF Backtest' },
+  'tool.metaDesc': { ko: 'QQQ·QLD·TQQQ 나스닥100 레버리지 ETF에 매일/매주/매월 적립식으로 투자했을 때의 결과를 최대 25년치 실데이터로 백테스트해보세요.', en: 'Backtest what happens when you dollar-cost-average into QQQ, QLD, and TQQQ Nasdaq-100 leveraged ETFs daily, weekly, or monthly — using up to 25 years of real data.' },
+  'tool.subtitle': { ko: 'QQQ · QLD · TQQQ 나스닥100 레버리지 ETF 백테스트 — 적립식 매수 시뮬레이션', en: 'QQQ · QLD · TQQQ Nasdaq-100 leveraged ETF backtest — dollar-cost-averaging simulator' },
+  'tool.loading': { ko: '데이터 로딩 중…', en: 'Loading data…' },
+  'tool.startDate': { ko: '시작일', en: 'Start Date' },
+  'tool.endDate': { ko: '종료일', en: 'End Date' },
+  'tool.freq': { ko: '매수 주기', en: 'Contribution Frequency' },
+  'tool.daily': { ko: '매일', en: 'Daily' },
+  'tool.weekly': { ko: '매주', en: 'Weekly' },
+  'tool.monthly': { ko: '매월', en: 'Monthly' },
+  'tool.amount': { ko: '월 환산 투자금액', en: 'Monthly-Equivalent Amount' },
+  'tool.presets': { ko: '기간 바로가기', en: 'Quick Range' },
+  'tool.preset1m': { ko: '최근 1개월', en: 'Last 1 Month' },
+  'tool.preset6m': { ko: '최근 6개월', en: 'Last 6 Months' },
+  'tool.preset1y': { ko: '최근 1년', en: 'Last 1 Year' },
+  'tool.preset3y': { ko: '최근 3년', en: 'Last 3 Years' },
+  'tool.preset5y': { ko: '최근 5년', en: 'Last 5 Years' },
+  'tool.presetAll': { ko: '전체 기간', en: 'All Time' },
+  'tool.weeklyDay': { ko: '매주 매수 요일', en: 'Weekly Purchase Day' },
+  'tool.mon': { ko: '월', en: 'Mon' },
+  'tool.tue': { ko: '화', en: 'Tue' },
+  'tool.wed': { ko: '수', en: 'Wed' },
+  'tool.thu': { ko: '목', en: 'Thu' },
+  'tool.fri': { ko: '금', en: 'Fri' },
+  'tool.monthlyDay': { ko: '매월 매수일', en: 'Monthly Purchase Day' },
+  'tool.md1': { ko: '매월 1일', en: '1st of Month' },
+  'tool.md15': { ko: '매월 15일', en: '15th of Month' },
+  'tool.mdLast': { ko: '매월 말일', en: 'Last Day of Month' },
+  'tool.costTitle': { ko: '레버리지 비용(운용보수·조달비용) 반영', en: 'Include Leverage Costs (Expense Ratio + Financing)' },
+  'tool.costDesc': {
+    ko: 'QLD·TQQQ는 나스닥100(QQQ 실제 수익률) 기반으로 합성됩니다. 켜면 연도별 평균 단기금리(Fed Funds)+0.35%p의 조달비용과 공시 운용보수(QLD 0.95%, TQQQ 0.86%)를 매일 차감해 실제 상품에 가깝게 반영하고, 끄면 순수 배율(2배·3배)만 적용한 이론적 상한을 봅니다.',
+    en: 'QLD and TQQQ are synthesized from QQQ’s actual returns (Nasdaq-100). Turning this on deducts, daily, a financing cost approximated from that year’s average short-term rate (Fed Funds) + a 0.35pp spread, plus each fund’s published expense ratio (QLD 0.95%, TQQQ 0.86%), to track the real products more closely. Turning it off shows the theoretical ceiling — pure 2x/3x leverage with no costs.'
+  },
+  'tool.chartTitle': { ko: '평가금액 추이', en: 'Portfolio Value Over Time' },
+  'tool.chartHint': { ko: '아래 눈금의 양쪽 손잡이를 드래그해 기간 조절 · 더블클릭으로 초기화', en: 'Drag either handle below to adjust the range · double-click to reset' },
+  'tool.scale': { ko: '스케일', en: 'Scale' },
+  'tool.linear': { ko: '선형', en: 'Linear' },
+  'tool.log': { ko: '로그', en: 'Log' },
+  'tool.detailTitle': { ko: '상세 지표', en: 'Detailed Metrics' },
+  'tool.metric': { ko: '지표', en: 'Metric' },
+  'tool.x': { ko: '배', en: 'x' },
+  'tool.footerNote': {
+    ko: 'QLD·TQQQ는 실제 상장 이전 구간을 포함해 QQQ의 실제 일별 총수익(배당 재투자 반영)에 배율과 비용 가정을 적용해 합성한 값입니다. 실제 상품의 스왑 구조·조달금리·추적오차와는 차이가 있을 수 있으며, 과거 성과가 미래 수익을 보장하지 않습니다. 투자 조언이 아닙니다. 가격 데이터 출처: Yahoo Finance(QQQ, 배당·분할 조정 종가).',
+    en: 'QLD and TQQQ figures — including periods before their actual listing dates — are synthesized by applying leverage multiples and cost assumptions to QQQ’s actual daily total return (dividends reinvested). Real products’ swap structure, financing rates, and tracking error may differ, and past performance does not guarantee future results. Not investment advice. Price data source: Yahoo Finance (QQQ, dividend/split-adjusted close).'
+  },
+
+  'about.title': { ko: '소개 및 방법론 — QQQ Leverage Lab', en: 'About & Methodology — QQQ Leverage Lab' },
+  'about.metaDesc': { ko: 'QQQ Leverage Lab이 QQQ·QLD·TQQQ 백테스트를 계산하는 방식과 데이터 출처, 가정을 설명합니다.', en: 'How QQQ Leverage Lab calculates QQQ, QLD, and TQQQ backtests — data sources and assumptions explained.' },
+
+  'privacy.title': { ko: '개인정보처리방침 — QQQ Leverage Lab', en: 'Privacy Policy — QQQ Leverage Lab' },
+  'privacy.metaDesc': { ko: 'QQQ Leverage Lab의 개인정보 수집·이용, 쿠키 및 광고 관련 방침을 안내합니다.', en: 'How QQQ Leverage Lab collects and uses information, and how cookies and advertising work on this site.' },
+
+  'terms.title': { ko: '이용약관 — QQQ Leverage Lab', en: 'Terms of Use — QQQ Leverage Lab' },
+  'terms.metaDesc': { ko: 'QQQ Leverage Lab 이용약관 및 투자 관련 면책조항입니다. 이 사이트는 투자 자문을 제공하지 않습니다.', en: 'QQQ Leverage Lab’s terms of use and investment disclaimer. This site does not provide investment advice.' }
+};

@@ -110,6 +110,24 @@ a { color: var(--accent); }
 .theme-toggle[data-current="light"] .icon-moon { display: block; }
 .theme-toggle[data-current="dark"] .icon-sun { display: block; }
 
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-dim);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  flex: none;
+}
+.lang-toggle:hover { color: var(--text); border-color: var(--border-strong); }
+
 main.prose {
   max-width: 720px;
   margin: 0 auto;
@@ -155,26 +173,6 @@ main.prose code {
   background: var(--surface-2);
   padding: 1px 5px;
   border-radius: 4px;
-}
-
-.ad-slot {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-.ad-slot .ad-box {
-  max-width: 336px;
-  margin: 0 auto 28px;
-  min-height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px dashed var(--border-strong);
-  border-radius: 8px;
-  color: var(--muted);
-  font-size: 0.7rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
 }
 
 .site-footer {
