@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<script>(function(){var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>이용약관 — QQQ Leverage Lab</title>
 <meta name="description" content="QQQ Leverage Lab 이용약관 및 투자 관련 면책조항입니다. 이 사이트는 투자 자문을 제공하지 않습니다.">
@@ -13,12 +14,18 @@
 <body>
   <header class="site-header">
     <a class="brand" href="index.html">QQQ Leverage Lab</a>
+    <div class="header-right">
     <nav>
       <a href="index.html">백테스트</a>
       <a href="about.html">소개</a>
       <a href="privacy.html">개인정보처리방침</a>
       <a href="terms.html" aria-current="page">이용약관</a>
     </nav>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="다크모드 전환">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </button>
+  </div>
   </header>
 
   <main class="prose">
@@ -69,5 +76,6 @@
       <a href="terms.html">이용약관</a>
     </nav>
   </footer>
+<script src="assets/theme.js" defer></script>
 </body>
 </html>
